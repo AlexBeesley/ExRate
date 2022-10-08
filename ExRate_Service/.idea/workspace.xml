@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3088c2b2-e801-4bc8-9fec-9534c2d9795e" name="Changes" comment="Added graph generation and UI">
-      <change afterPath="$PROJECT_DIR$/MLTraining/Neuron.py" afterDir="false" />
+    <list default="true" id="3088c2b2-e801-4bc8-9fec-9534c2d9795e" name="Changes" comment="added some initial neural network work">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MLTraining/Neuron.py" beforeDir="false" afterPath="$PROJECT_DIR$/MLTraining/Neuron.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,7 +95,14 @@
       <option name="project" value="LOCAL" />
       <updated>1664888236042</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="added some initial neural network work">
+      <created>1664898251027</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1664898251027</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -112,6 +119,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="further progress" />
     <MESSAGE value="Added graph generation and UI" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added graph generation and UI" />
+    <MESSAGE value="added some initial neural network work" />
+    <option name="LAST_COMMIT_MESSAGE" value="added some initial neural network work" />
   </component>
 </project>
