@@ -4,15 +4,6 @@ from DataServices import GetResponseFromAPI
 days_in_a_year = 365
 
 
-def processCurrent():
-    response_GBPtoUSD = GetResponseFromAPI.getCurrent("GBP", "USD")
-    response_GBPtoEUR = GetResponseFromAPI.getCurrent("GBP", "EUR")
-    result_GBPtoUSD = response_GBPtoUSD["result"]
-    result_GBPtoEUR = response_GBPtoEUR["result"]
-    print("Current GBP to USD Exchange Rate : ", result_GBPtoUSD)
-    print("Current GBP to EUR Exchange Rate : ", result_GBPtoEUR)
-
-
 def processTimeSeries(base, target):
     end_date = datetime.datetime.now()
     start_date = datetime.datetime.now() - datetime.timedelta(days=days_in_a_year)
