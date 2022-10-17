@@ -1,4 +1,4 @@
-from DataVisualisation import GenerateGraphFromData
+import GenerateGraphFromData
 
 print("Welcome to ExRate")
 base = input("""Please provide a base currency.

@@ -1,5 +1,5 @@
 import datetime
-from DataServices import GetResponseFromAPI
+import GetResponseFromAPI
 
 days_in_a_year = 365
 

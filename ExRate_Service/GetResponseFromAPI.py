@@ -1,12 +1,15 @@
 import requests
+from dotenv import load_dotenv
+import os
 
-# API key: 7Kggh7lfPJ12j0BadbKgpSTUGJ5m8s6N
-
+print(load_dotenv())
 payload = {}
-headers = {
-    "apikey": "7Kggh7lfPJ12j0BadbKgpSTUGJ5m8s6N"
-}
 
+KEY = os.environ.get("API_KEY")
+
+headers = {
+    "apikey": KEY
+}
 
 def getCurrent(FROM, TO):
     url = "https://api.apilayer.com/exchangerates_data/convert?to={}&from={}&amount=1".format(TO, FROM)
