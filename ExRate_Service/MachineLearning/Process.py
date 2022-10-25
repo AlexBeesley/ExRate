@@ -8,10 +8,8 @@ import ssl
 try:
     _create_unverified_https_context = ssl._create_unverified_context
 except AttributeError:
-    # Legacy Python that doesn't verify HTTPS certificates by default
     pass
 else:
-    # Handle target environment that doesn't support HTTPS verification
     ssl._create_default_https_context = _create_unverified_https_context
 
 # Model / data parameters
@@ -46,8 +44,8 @@ model = keras.Sequential(
 )
 
 model.summary()
-batch_size = 256
-epochs = 100
+batch_size = 128
+epochs = 10
 
 model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1)
