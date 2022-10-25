@@ -1,8 +1,15 @@
 import requests
 from dotenv import load_dotenv
+import ErrorHandling
 import os
 
-print(load_dotenv())
+
+if load_dotenv():
+    pass
+else:
+    raise ErrorHandling.NewException("Failed to mount dotenv. \nThe dotenv file is required as it contains the API "
+                                     "Key. \nEnsure this file is present in the root directory and try again.")
+
 payload = {}
 
 KEY = os.environ.get("API_KEY")

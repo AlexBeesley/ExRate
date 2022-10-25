@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import dates as mdates
-import ProcessDataFromResponse
+from DataFetching import ProcessDataFromResponse
 
 
 def generateGraph(base, target):
