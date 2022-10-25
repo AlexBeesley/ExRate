@@ -1,6 +1,6 @@
 import requests
 from dotenv import load_dotenv
-import ErrorHandling
+from Services import ErrorHandling
 import os
 
 
