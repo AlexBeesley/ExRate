@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 from Services import ErrorHandling
 import os
 
-
 if load_dotenv():
     pass
 else:
@@ -17,6 +16,7 @@ KEY = os.environ.get("API_KEY")
 headers = {
     "apikey": KEY
 }
+
 
 def getCurrent(FROM, TO):
     url = "https://api.apilayer.com/exchangerates_data/convert?to={}&from={}&amount=1".format(TO, FROM)
