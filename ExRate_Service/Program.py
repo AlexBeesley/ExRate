@@ -1,3 +1,6 @@
+import os
+
+import numpy as np
 from pandas import *
 
 from DataFetching.ProcessDataFromResponse import ProcessDataFromResponse
@@ -5,8 +8,17 @@ from DataVisualisation import GenerateGraphFromData
 from MachineLearning.LSTMModel import LSTMModel
 from MachineLearning.NormalizeData import NormalizeData
 
+
+# INFO log level messages not printed, set to 0 to enable INFO logs
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
+
 data = read_csv("Assets/currency_codes.csv")
 abvs = data['AlphabeticCode'].tolist()
+
+input_shape = (7, 1)
+units = 64
+epochs = 100
+batch_size = 16
 
 
 def GetUserInputs():
@@ -14,32 +26,33 @@ def GetUserInputs():
     target = input("""Please provide a target currency: """)
     return base, target
 
+
 print("Welcome to ExRate")
 base, target = GetUserInputs()
 if target in abvs and base in abvs:
-    #GenerateGraphFromData.generateGraph(base, target)
-    forecaster = ProcessDataFromResponse(base='USD', target='EUR')
-    rates, dates = forecaster.process()
-    print(rates)
-    print(dates)
-    normalizer = NormalizeData()
-    normalized_rates = normalizer.normalize(rates)
-    print(normalized_rates)
-    input_shape = (7, 1)
-    units = 64
-    epochs = 100
+    forecaster = ProcessDataFromResponse(base=base, target=target)
+    wrates, wdates, yrates, ydates = forecaster.process()
 
-    model = LSTMModel(input_shape, units)
+    GenerateGraphFromData.generateGraph(yrates, ydates, base, target)
+
+    normalizer = NormalizeData()
+    normalized_rates = normalizer.normalize(yrates)
+
+    model = LSTMModel(units=units, input_shape=input_shape)
     inputs = np.array([normalized_rates[i:i + 7] for i in range(len(normalized_rates) - 7)])
     inputs = inputs.reshape(-1, 7, 1)
     outputs = normalized_rates[7:]
-    model.train(inputs, outputs, epochs)
+
+    model.compile(loss='mean_squared_error', optimizer='adam')
+    model.fit(inputs, outputs, epochs=epochs, batch_size=batch_size, verbose=0)
+    print("Accuracy: ", model.evaluate(inputs, outputs))
 
     prediction = model.predict(inputs[-1].reshape(1, 7, 1))
-    print(prediction)
-    print("Accuracy: ", model.model.evaluate(inputs, outputs))
+    prediction = normalizer.denormalize(prediction)
+    prediction = [item for sublist in prediction for item in sublist]
+    print(f"Forecast: {prediction}")
+    print(f"Actual: {wrates}")
 
-
-
+    GenerateGraphFromData.generateGraphWithForecast(yrates, ydates, prediction, base, target)
 else:
     print("Try again; please provide a correct currency abbreviation. e.g. GBP, USD, EUR etc.")
