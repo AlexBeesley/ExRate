@@ -3,6 +3,8 @@
 __pycache__
 .idea
 node_modules
+obj/
+.vs/
 
 # .NET template
 ## Ignore Visual Studio temporary files, build results, and
