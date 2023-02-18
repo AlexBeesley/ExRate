@@ -7,12 +7,13 @@ namespace ExRate_API.Controllers
     [Route("api/[controller]")]
     public class PythonListenerController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult Get()
+        [HttpGet("{baseCurrency}/{targetCurrency}")]
+        public IActionResult Get(string baseCurrency, string targetCurrency)
         {
             var pythonListener = new PythonListener();
-            var output = pythonListener.getOutput();
+            var output = pythonListener.getOutput(baseCurrency, targetCurrency);
             return Ok(new { output });
         }
+
     }
 }
