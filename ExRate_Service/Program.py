@@ -1,3 +1,4 @@
+import argparse
 import os
 
 import numpy as np
@@ -27,32 +28,45 @@ def GetUserInputs():
     return base, target
 
 
-print("Welcome to ExRate")
-base, target = GetUserInputs()
-if target in abvs and base in abvs:
-    forecaster = ProcessDataFromResponse(base=base, target=target)
-    wrates, wdates, yrates, ydates = forecaster.process()
+def run_app(base, target):
+    if target in abvs and base in abvs:
+        forecaster = ProcessDataFromResponse(base=base, target=target)
+        wrates, wdates, yrates, ydates = forecaster.process()
 
-    GenerateGraphFromData.generateGraph(yrates, ydates, base, target)
+        GenerateGraphFromData.generateGraph(yrates, ydates, base, target)
 
-    normalizer = NormalizeData()
-    normalized_rates = normalizer.normalize(yrates)
+        normalizer = NormalizeData()
+        normalized_rates = normalizer.normalize(yrates)
 
-    model = LSTMModel(units=units, input_shape=input_shape)
-    inputs = np.array([normalized_rates[i:i + 7] for i in range(len(normalized_rates) - 7)])
-    inputs = inputs.reshape(-1, 7, 1)
-    outputs = normalized_rates[7:]
+        model = LSTMModel(units=units, input_shape=input_shape)
+        inputs = np.array([normalized_rates[i:i + 7] for i in range(len(normalized_rates) - 7)])
+        inputs = inputs.reshape(-1, 7, 1)
+        outputs = normalized_rates[7:]
 
-    model.compile(loss='mean_squared_error', optimizer='adam')
-    model.fit(inputs, outputs, epochs=epochs, batch_size=batch_size, verbose=0)
-    print("Accuracy: ", model.evaluate(inputs, outputs))
+        model.compile(loss='mean_squared_error', optimizer='adam')
+        model.fit(inputs, outputs, epochs=epochs, batch_size=batch_size, verbose=0)
+        print("Accuracy: ", model.evaluate(inputs, outputs))
 
-    prediction = model.predict(inputs[-1].reshape(1, 7, 1))
-    prediction = normalizer.denormalize(prediction)
-    prediction = [item for sublist in prediction for item in sublist]
-    print(f"Forecast: {prediction}")
-    print(f"Actual: {wrates}")
+        prediction = model.predict(inputs[-1].reshape(1, 7, 1))
+        prediction = normalizer.denormalize(prediction)
+        prediction = [item for sublist in prediction for item in sublist]
+        print(f"Forecast: {prediction}")
+        print(f"Actual: {wrates}")
 
-    GenerateGraphFromData.generateGraphWithForecast(yrates, ydates, prediction, base, target)
-else:
-    print("Try again; please provide a correct currency abbreviation. e.g. GBP, USD, EUR etc.")
+        GenerateGraphFromData.generateGraphWithForecast(yrates, ydates, prediction, base, target)
+    else:
+        print("Try again; please provide a correct currency abbreviation. e.g. GBP, USD, EUR etc.")
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='ExRate')
+    parser.add_argument('-b', '--base', type=str, help='Base currency')
+    parser.add_argument('-t', '--target', type=str, help='Target currency')
+    args = parser.parse_args()
+
+    if args.base and args.target:
+        run_app(args.base.upper(), args.target.upper())
+    else:
+        print("Welcome to ExRate")
+        base, target = GetUserInputs()
+        run_app(base.upper(), target.upper())
