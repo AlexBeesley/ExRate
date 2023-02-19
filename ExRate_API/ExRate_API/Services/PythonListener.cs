@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace ExRate_API.Services
 {
@@ -38,7 +39,16 @@ namespace ExRate_API.Services
             process.BeginOutputReadLine();
             process.WaitForExit();
 
-            return output;
+            var historicalData = JsonConvert.DeserializeObject<Dictionary<string, object>>(output.Substring(0, output.IndexOf("}") + 1));
+            var forecast = JsonConvert.DeserializeObject<Dictionary<string, object>>(output.Substring(output.IndexOf("}") + 1));
+
+            var result = new Dictionary<string, Dictionary<string, object>>();
+            result.Add("historicalData", historicalData);
+            result.Add("forecast", forecast);
+
+            var json = JsonConvert.SerializeObject(result, Formatting.Indented);
+
+            return json;
         }
     }
 }

@@ -12,7 +12,7 @@ namespace ExRate_API.Controllers
         {
             var pythonListener = new PythonListener();
             var output = pythonListener.getOutput(baseCurrency, targetCurrency);
-            return Ok(new { output });
+            return Ok(output);
         }
 
     }
