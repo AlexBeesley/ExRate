@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System.Diagnostics;
 
-namespace ExRate_API.Services
+namespace ExRate_API.DataFromService
 {
-    public class PythonListener
+    public class GetExRateForecast
     {
         private string GetSolutionParentDirectory()
         {
@@ -15,7 +15,7 @@ namespace ExRate_API.Services
             var scriptPath = GetSolutionParentDirectory() + @"\Program.py";
             var scriptDirectory = Path.GetDirectoryName(scriptPath);
 
-            var output = String.Empty;
+            var output = string.Empty;
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
@@ -43,8 +43,8 @@ namespace ExRate_API.Services
             var forecast = JsonConvert.DeserializeObject<Dictionary<string, object>>(output.Substring(output.IndexOf("}") + 1));
 
             var result = new Dictionary<string, Dictionary<string, object>>();
-            result.Add("historicalData", historicalData);
-            result.Add("forecast", forecast);
+            result.Add("historicalData", historicalData ?? new Dictionary<string, object>());
+            result.Add("forecast", forecast ?? new Dictionary<string, object>());
 
             var json = JsonConvert.SerializeObject(result, Formatting.Indented);
 
