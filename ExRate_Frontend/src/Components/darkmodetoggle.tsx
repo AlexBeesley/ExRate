@@ -19,30 +19,29 @@ export default function DarkModeToggle() {
   console.log("dark mode:", toggle);
 
   if (toggle) {
-    root.style.setProperty('--Primary', '#9FACBD');
-    root.style.setProperty('--Secondary', '#009AFA');
-    root.style.setProperty('--Tertiary', '#8FC3F7');
-    root.style.setProperty('--Quaternary', '#02629e');
-    root.style.setProperty('--Accent', '#F9F871');
-    root.style.setProperty('--background', '#00182e');
-    root.style.setProperty('--shadow', '#000d18');
-    root.style.setProperty('--highlight', '#002344');
-    root.style.setProperty('--light', '#ffffff5d');
-    root.style.setProperty('--light-hover', '#F9F871');
+    root.style.setProperty('--Primary', '#FFF');
+    root.style.setProperty('--Secondary', '#FFF');
+    root.style.setProperty('--Tertiary', '#FFF');
+    root.style.setProperty('--Quaternary', '#FFF');
+    root.style.setProperty('--Accent', '#FFF');
+    root.style.setProperty('--background', '#FFF');
+    root.style.setProperty('--shadow', '#FFF');
+    root.style.setProperty('--highlight', '#FFF');
+    root.style.setProperty('--light', '#FFF');
+    root.style.setProperty('--light-hover', '#FFF');
+  } else {
+    root.style.setProperty('--Primary', '#000');
+    root.style.setProperty('--Secondary', '#000');
+    root.style.setProperty('--Tertiary', '#000');
+    root.style.setProperty('--Quaternary', '#000');
+    root.style.setProperty('--Accent', '#000');
+    root.style.setProperty('--background', '#000');
+    root.style.setProperty('--shadow', '#000');
+    root.style.setProperty('--highlight', '#000');
+    root.style.setProperty('--light', '#000');
+    root.style.setProperty('--light-hover', '#000');
   }
-
-  else {
-    root.style.setProperty('--Primary', '#004D79');
-    root.style.setProperty('--Secondary', '#002B53');
-    root.style.setProperty('--Tertiary', '#009AFA');
-    root.style.setProperty('--Quaternary', '#02629e');
-    root.style.setProperty('--Accent', '#F9F871');
-    root.style.setProperty('--background', '#9ccaf7');
-    root.style.setProperty('--shadow', '#85acd2');
-    root.style.setProperty('--highlight', '#b3e8ff');
-    root.style.setProperty('--light', '#ffffff');
-    root.style.setProperty('--light-hover', '#F9F871');
-  }
+  
 
   return (
     <div className={Styles.darkmodetoggle}>

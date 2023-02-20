@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Styles from '../Styles/main.module.scss';
 
 export default function Home() {
-  const [currencies, setCurrencies] = useState([]);
+  const [currencies, setCurrencies] = useState<string[]>([]);
   const [baseCurrency, setBaseCurrency] = useState('');
   const [targetCurrency, setTargetCurrency] = useState('');
   const [result, setResult] = useState('');
@@ -29,7 +29,7 @@ export default function Home() {
       .catch(error => console.error(error));
   }, []);
 
-  const handleCurrencyChange = (event) => {
+  const handleCurrencyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     // Handle changes to currency dropdown values
     const selectedCurrency = event.target.value;
     if (event.target.id === 'currency1') {
@@ -38,13 +38,16 @@ export default function Home() {
       setTargetCurrency(selectedCurrency);
     }
   }
+  
 
   const handleButtonClick = async () => {
     // Call the API with the selected currencies and display the result
     setIsLoading(true);
     try {
-      const response = await fetch(`https://localhost:7064/api/GetExRateForecast/${selectedCurrencies.base}&${selectedCurrencies.target}`);
+      const response = await fetch(`https://localho.st:7064/api/GetExRateForecast/${baseCurrency}&${targetCurrency}`);
+      console.log(response);
       const data = await response.text();
+      console.log(data);
       setResult(data);
     } catch (error) {
       console.error(error);
@@ -52,6 +55,7 @@ export default function Home() {
     }
     setIsLoading(false);
   }
+  
 
   const isButtonDisabled = !baseCurrency || !targetCurrency || isLoading;
 
