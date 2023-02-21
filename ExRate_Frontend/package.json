@@ -19,6 +19,8 @@
    "author": "Vishwas",
    "license": "MIT",
    "dependencies": {
+      "canvasjs": "^1.8.3",
+      "canvasjs-react-charts": "^1.0.5",
       "chart.js": "^4.2.1",
       "netlify-cli": "^10.6.2",
       "react": "^17.0.1",

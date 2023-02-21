@@ -17,12 +17,12 @@ namespace ExRate_API.Controllers
         [HttpGet("{baseCurrency}&{targetCurrency}")]
         public IActionResult Get(string baseCurrency, string targetCurrency)
         {
-            _logger.LogInformation($"Request received for baseCurrency: {baseCurrency}, targetCurrency: {targetCurrency}");
+            _logger.LogDebug($"Request received for baseCurrency: {baseCurrency}, targetCurrency: {targetCurrency}");
 
             var pythonListener = new GetExRateForecast();
             var output = pythonListener.getOutput(baseCurrency, targetCurrency);
 
-            _logger.LogInformation($"Response sent for baseCurrency: {baseCurrency}, targetCurrency: {targetCurrency}");
+            _logger.LogDebug($"Response sent for baseCurrency: {baseCurrency}, targetCurrency: {targetCurrency}");
 
             return Ok(output);
         }

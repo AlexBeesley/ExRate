@@ -19,12 +19,12 @@ export default function DarkModeToggle() {
   console.log("dark mode:", toggle);
 
   if (toggle) {
-    root.style.setProperty('--Primary', '#FFF');
-    root.style.setProperty('--Secondary', '#FFF');
-    root.style.setProperty('--Tertiary', '#FFF');
-    root.style.setProperty('--Quaternary', '#FFF');
-    root.style.setProperty('--Accent', '#FFF');
-    root.style.setProperty('--background', '#FFF');
+    root.style.setProperty('--Primary', '#D9EDDF');
+    root.style.setProperty('--Secondary', '#679C76');
+    root.style.setProperty('--Tertiary', '#006B6C');
+    root.style.setProperty('--Quaternary', '#5E5E5E');
+    root.style.setProperty('--Accent', '#00FF88');
+    root.style.setProperty('--background', '#001900');
     root.style.setProperty('--shadow', '#FFF');
     root.style.setProperty('--highlight', '#FFF');
     root.style.setProperty('--light', '#FFF');

@@ -1,27 +1,35 @@
+import Styles from '../Styles/home.module.scss';
 import { useState, useEffect } from 'react';
-import Styles from '../Styles/main.module.scss';
+import Chart from 'chart.js/auto';
+import Loader from "react-spinners/PropagateLoader";
+
 
 export default function Home() {
+  let root = document.documentElement;
+
   const [currencies, setCurrencies] = useState<string[]>([]);
   const [baseCurrency, setBaseCurrency] = useState('');
   const [targetCurrency, setTargetCurrency] = useState('');
+  const [dropdownOptions, setDropdownOptions] = useState<string[]>([]);
   const [result, setResult] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState<any>(null);
 
   useEffect(() => {
-    // Fetch the CSV data and extract the currency abbreviations
     fetch('/Data/currency_codes.csv')
       .then(response => response.text())
       .then(data => {
-        const rows = data.split('\n').slice(1); // Ignore header row
-        const currencies = rows.map(row => row.split(',')[2].trim()).filter((currency, index, self) => currency.length === 3 && index === self.indexOf(currency)); // Filter out duplicates and entries longer than 3 characters
+        const rows = data.split('\n').slice(1);
+        const currencies = rows
+          .map(row => row.split(',')[2].trim())
+          .filter((currency, index, self) => currency.length === 3 && index === self.indexOf(currency));
         currencies.sort((a, b) => {
           if (a === 'USD' || a === 'GBP' || a === 'EUR') {
-            return -1; // a is higher priority
+            return -1;
           } else if (b === 'USD' || b === 'GBP' || b === 'EUR') {
-            return 1; // b is higher priority
+            return 1;
           } else {
-            return a.localeCompare(b); // compare alphabetically
+            return a.localeCompare(b);
           }
         });
         setCurrencies(currencies);
@@ -29,8 +37,53 @@ export default function Home() {
       .catch(error => console.error(error));
   }, []);
 
+  useEffect(() => {
+    setDropdownOptions(currencies);
+  }, [currencies]);
+
+  useEffect(() => {
+    if (data) {
+      const chartElement = document.getElementById('chart');
+      const existingChart = Chart.getChart(chartElement);
+      if (existingChart) {
+        existingChart.destroy();
+      }
+      const historicalData = Object.entries(data.historicalData).map(([date, rate]) => ({ x: date, y: rate }));
+      const forecastData = Object.entries(data.forecast).map(([date, rate]) => ({ x: date, y: rate }));
+      const chartData = {
+        datasets: [
+          {
+            label: 'Historical Rates',
+            data: historicalData,
+            borderColor: 'green',
+            fill: false,
+          },
+          {
+            label: 'Forecast',
+            data: forecastData,
+            borderColor: 'red',
+            fill: false,
+          },
+        ],
+      };
+      const options = {
+        plugins: {
+          title: {
+            display: true,
+            text: `${baseCurrency} to ${targetCurrency} exchange rate forecast`,
+          }
+        }
+      };      
+      const chartConfig = {
+        type: 'line',
+        data: chartData,
+        options: options,
+      };
+      new Chart(chartElement, chartConfig);
+    }
+  }, [data]);
+
   const handleCurrencyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    // Handle changes to currency dropdown values
     const selectedCurrency = event.target.value;
     if (event.target.id === 'currency1') {
       setBaseCurrency(selectedCurrency);
@@ -38,56 +91,47 @@ export default function Home() {
       setTargetCurrency(selectedCurrency);
     }
   }
-  
 
   const handleButtonClick = async () => {
-    // Call the API with the selected currencies and display the result
     setIsLoading(true);
-    try {
-      const response = await fetch(`https://localho.st:7064/api/GetExRateForecast/${baseCurrency}&${targetCurrency}`);
-      console.log(response);
-      const data = await response.text();
-      console.log(data);
-      setResult(data);
-    } catch (error) {
-      console.error(error);
-      setResult('An error occurred while calling the API.');
-    }
+    const response = await fetch(`https://localho.st:7064/api/GetExRateForecast/${baseCurrency}&${targetCurrency}`);
+    const jsonData = await response.json();
+    setData(jsonData);
+    setResult(response.status === 200 ? 'Success!' : 'An error occurred while calling the API.');
     setIsLoading(false);
-  }
-  
+  };
 
+  const baseCurrencyOptions = baseCurrency ? [baseCurrency, ...dropdownOptions] : ['Select base currency', ...dropdownOptions];
+  const targetCurrencyOptions = targetCurrency ? [targetCurrency, ...dropdownOptions] : ['Select target currency', ...dropdownOptions];
   const isButtonDisabled = !baseCurrency || !targetCurrency || isLoading;
 
   return (
-    <div className={Styles.title}>
+    <>
       <h1>Welcome to ExRate</h1>
-      <h3>This is a work in progress React App</h3>
-
-      <div>
-        <label htmlFor="currency1">Please select a base currency:</label>
-        <select id="currency1" name="currency1" onChange={handleCurrencyChange}>
-          <option value="">Select currency</option>
-          {currencies.map(currency => (
-            <option key={currency} value={currency}>{currency}</option>
-          ))}
-        </select>
+      <h2>ExRate is a web app that allows you to get the exchange rate forecast for any currency pair.</h2>
+      <div className={Styles.container}>
+        <div className={Styles.dropdown}>
+          <select id="currency1" value={baseCurrency} onChange={handleCurrencyChange}>
+            {baseCurrencyOptions.map(currency => (
+              <option key={currency} value={currency}>{currency}</option>
+            ))}
+          </select>
+        </div>
+        <div className={Styles.dropdown}>
+          <select id="currency2" value={targetCurrency} onChange={handleCurrencyChange}>
+            {targetCurrencyOptions.map(currency => (
+              <option key={currency} value={currency}>{currency}</option>
+            ))}
+          </select>
+        </div>
+        <button className={Styles.button} onClick={handleButtonClick} disabled={isButtonDisabled}>Get forecast</button>
       </div>
-
-      <div>
-        <label htmlFor="currency2">Please select a target currency:</label>
-        <select id="currency2" name="currency2" onChange={handleCurrencyChange}>
-          <option value="">Select currency</option>
-          {currencies.map(currency => (
-            <option key={currency} value={currency}>{currency}</option>
-          ))}
-        </select>
+      <div className={Styles.chart}>
+        <div className={Styles.loader} style={{ display: isLoading ? 'block' : 'none' }}>
+          <Loader color={root.style.getPropertyValue('--Secondary')} size={15} />
+        </div>
+        <canvas id="chart" style={{ display: isLoading ? 'none' : 'block' }}></canvas>
       </div>
-
-      <button onClick={handleButtonClick} disabled={isButtonDisabled}>Get exchange rate forecast</button>
-
-      {isLoading && <p>Loading...</p>}
-      {!isLoading && result && <textarea value={result} readOnly></textarea>}
-    </div>
-  );
+    </>
+    );
 }
