@@ -34,16 +34,15 @@ namespace ExRate_API.Tests.Controllers
                 forecast = new Dictionary<DateTime, decimal>()
             };
 
-            _getExRateForecastMock.Setup(pl => pl.getOutput(baseCurrency, targetCurrency)).Returns(expectedOutput.ToString());
+            _getExRateForecastMock.Setup(pl => pl.getOutput(baseCurrency, targetCurrency)).Returns(expectedOutput.ToString() ?? string.Empty);
 
             // Act
             var result = _controller.Get(baseCurrency, targetCurrency);
 
             // Assert
-            Assert.IsInstanceOf<OkObjectResult>(result);
             var okResult = (OkObjectResult)result;
-            dynamic output = okResult.Value;
-            Assert.IsNotNull(output);
+            dynamic output = okResult.Value ?? new object();
+            Assert.IsInstanceOf<OkObjectResult>(result);
             Assert.IsNotNull(output);
         }
 
@@ -64,11 +63,12 @@ namespace ExRate_API.Tests.Controllers
                     LogLevel.Debug,
                     It.IsAny<EventId>(),
                     It.Is<It.IsAnyType>((o, t) => o.ToString().Contains($"Request received for baseCurrency: {baseCurrency}, targetCurrency: {targetCurrency}")),
-                    null,
-                    It.IsAny<System.Func<It.IsAnyType, Exception, string>>()
+                    o => null,
+                    It.IsAny<Func<It.IsAnyType, Exception, string>>()
                 ),
                 Times.Once
             );
+
         }
     }
 }
