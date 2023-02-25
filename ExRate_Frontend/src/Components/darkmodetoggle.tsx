@@ -31,15 +31,15 @@ export default function DarkModeToggle() {
     root.style.setProperty('--light-hover', '#FFF');
   } else {
     root.style.setProperty('--Primary', '#000');
-    root.style.setProperty('--Secondary', '#000');
-    root.style.setProperty('--Tertiary', '#000');
-    root.style.setProperty('--Quaternary', '#000');
-    root.style.setProperty('--Accent', '#000');
-    root.style.setProperty('--background', '#000');
+    root.style.setProperty('--Secondary', '#8FBC8F');
+    root.style.setProperty('--Tertiary', '#00CED1');
+    root.style.setProperty('--Quaternary', '#A9A9A9');
+    root.style.setProperty('--Accent', '#FFC0CB');
+    root.style.setProperty('--background', '#F5F5F5');
     root.style.setProperty('--shadow', '#000');
     root.style.setProperty('--highlight', '#000');
     root.style.setProperty('--light', '#000');
-    root.style.setProperty('--light-hover', '#000');
+    root.style.setProperty('--light-hover', '#000');    
   }
   
 
