@@ -3,7 +3,6 @@ using ExRate_API.DataFromService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NUnit.Framework;
 
 namespace ExRate_API.Tests.Controllers
 {
@@ -63,7 +62,7 @@ namespace ExRate_API.Tests.Controllers
                     LogLevel.Debug,
                     It.IsAny<EventId>(),
                     It.Is<It.IsAnyType>((o, t) => o.ToString().Contains($"Request received for baseCurrency: {baseCurrency}, targetCurrency: {targetCurrency}")),
-                    o => null,
+                    null,
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()
                 ),
                 Times.Once
