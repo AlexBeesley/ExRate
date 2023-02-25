@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace ExRate_API.DataFromService
 {
-    public class GetExRateForecast
+    public class GetExRateForecast : IGetExRateForecast
     {
         private string GetSolutionParentDirectory()
         {
