@@ -3,7 +3,7 @@ nav {
 }
 
 .activelink {
-  color: var(--Quaternary);
+  color: var(--Secondary);
 }
 
 .activeicon {
@@ -26,7 +26,7 @@ nav {
   color: var(--Accent);
 }
 
-@media only screen and (max-width: 65rem) {
+@media only screen and (max-width: 40rem) {
   nav{
 
   }
@@ -34,7 +34,7 @@ nav {
     display: none;
   }
   .activeicon {
-    color: var(--Quaternary);
+    color: var(--Secondary);
     display: inline;
   }
 

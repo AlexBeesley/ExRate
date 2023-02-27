@@ -8,7 +8,6 @@
 }
 
 .dropdown {
-    position: relative;
     display: inline-block;
     margin: 1rem;
     select{
@@ -34,7 +33,7 @@
     display: inline-block;
     padding: 1rem;
     margin-left: 5rem;
-    width: 14rem;
+    width: 16rem;
     font-size: 1.2rem;
     text-align: center;
     border: 1px solid var(--Primary);
@@ -51,28 +50,8 @@
         background: var(--Primary);
         color: var(--Secondary);
         border: 1px solid var(--Secondary);
-        &:hover {
-            cursor: not-allowed;
-            background: var(--Primary);
-            color: var(--Secondary);
-        }
+        cursor: not-allowed;
     }
-}
-
-.textarea {
-    display: inline-block;
-    padding: 1rem;
-    margin: 1rem;
-    width: 80%;
-    height: 50vh;
-    resize: none;
-    font-size: 1.2rem;
-    text-align: center;
-    border: 1px solid var(--Primary);
-    border-radius: 0.5rem;
-    background: var(--Primary);
-    color: var(--Quaternary);
-    cursor: text;
 }
 
 .chart {
@@ -83,10 +62,11 @@
     width: 100%;
     height: 100%;
     .loader {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 0;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 50%;
+        transform: translateX(-50%);
         padding-top: 8rem;
     }
     canvas {

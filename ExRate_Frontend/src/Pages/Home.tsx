@@ -1,7 +1,7 @@
 import Styles from '../Styles/home.module.scss';
 import { useState, useEffect } from 'react';
 import Chart from 'chart.js/auto';
-import Loader from "react-spinners/PropagateLoader";
+import Loader from "react-spinners/PuffLoader";
 
 
 export default function Home() {
@@ -143,12 +143,10 @@ export default function Home() {
         </div>
         <button className={Styles.button} onClick={handleButtonClick} disabled={isButtonDisabled}>Get forecast</button>
       </div>
-      <div className={Styles.chart}>
-        <div className={Styles.loader} style={{ display: isLoading ? 'block' : 'none' }}>
-          <Loader color={root.style.getPropertyValue('--Secondary')} size={15} />
-        </div>
-        <canvas id="chart" style={{ display: isLoading ? 'none' : 'block' }}></canvas>
+      <div className={Styles.loader} style={{ display: isLoading ? 'block' : 'none' }}>
+        <Loader color={root.style.getPropertyValue('--Secondary')} size={100} />
       </div>
+      <canvas id="chart" style={{ display: isLoading ? 'none' : 'block' }} />
     </>
     );
 }
