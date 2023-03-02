@@ -1,5 +1,5 @@
 import Styles from '../Styles/home.module.scss';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 import Loader from "react-spinners/PuffLoader";
 
@@ -12,8 +12,9 @@ export default function Home() {
   const [targetCurrency, setTargetCurrency] = useState('');
   const [dropdownOptions, setDropdownOptions] = useState<string[]>([]);
   const [result, setResult] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState('unset');
   const [data, setData] = useState<any>(null);
+  const canvasRef = useRef(null);
 
   useEffect(() => {
     fetch('/Data/currency_codes.csv')
@@ -46,62 +47,71 @@ export default function Home() {
   useEffect(() => {
     setDropdownOptions(currencies);
   }, [currencies]);
-
+  
   useEffect(() => {
     if (data) {
-      const chartElement = document.getElementById('chart');
-      const existingChart = Chart.getChart(chartElement);
-      if (existingChart) {
-        existingChart.destroy();
-      }
-      const historicalData = Object.entries(data.historicalData).map(([date, rate]) => ({ x: date, y: rate }));
-      const forecastData = Object.entries(data.forecast).map(([date, rate]) => ({ x: date, y: rate }));
-      const chartData = {
-        datasets: [
-          {
-            label: 'Historical Rates',
-            data: historicalData,
-            borderColor: 'green',
-            fill: false,
-          },
-          {
-            label: 'Forecast',
-            data: forecastData,
-            borderColor: 'red',
-            fill: false,
-          },
-        ],
-      };
-      const options = {
-        plugins: {
-          title: {
-            display: true,
-            text: `${baseCurrency} to ${targetCurrency} exchange rate forecast`,
-          }
+      setTimeout(() => {
+        const chartElement = canvasRef.current;
+        const existingChart = Chart.getChart(chartElement);
+        if (existingChart) {
+          existingChart.destroy();
         }
-      };      
-      const chartConfig = {
-        type: 'line',
-        data: chartData,
-        options: options,
-      };
-      new Chart(chartElement, chartConfig);
+        const historicalData = Object.entries(data.historicalData).map(([date, rate]) => ({ x: date, y: rate }));
+        const forecastData = Object.entries(data.forecast).map(([date, rate]) => ({ x: date, y: rate }));
+        const chartData = {
+          datasets: [
+            {
+              label: 'Historical Rates',
+              data: historicalData,
+              borderColor: 'green',
+              fill: false,
+            },
+            {
+              label: 'Forecast',
+              data: forecastData,
+              borderColor: 'red',
+              fill: false,
+            },
+          ],
+        };
+        const options = {
+          plugins: {
+            title: {
+              display: true,
+              text: `${baseCurrency} to ${targetCurrency} exchange rate forecast`,
+            }
+          }
+        };      
+        const chartConfig = {
+          type: 'line',
+          data: chartData,
+          options: options,
+        };
+        new Chart(chartElement, chartConfig);
+      }, 10);
     }
   }, [data]);
 
+  const handleButtonClick = async () => {
+    setIsLoading('true');
+    const response = await fetch(`https://localho.st:7064/api/GetExRateForecast/${baseCurrency}&${targetCurrency}`);
+    const jsonData = await response.json();
+    setData(jsonData);
+    setResult(response.status === 200 ? 'Success!' : 'An error occurred while calling the API.');
+    setIsLoading('false');
+  };
+  
   const handleCurrencyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCurrency = event.target.value;
     if (event.target.id === 'currency1') {
       setBaseCurrency(selectedCurrency);
       setDropdownOptions(currencies.filter(currency => currency !== selectedCurrency));
-      // Remove the selected currency from the options in the other dropdown
       if (selectedCurrency === targetCurrency) {
         setTargetCurrency('');
       }
     } else {
       setTargetCurrency(selectedCurrency);
       setDropdownOptions(currencies.filter(currency => currency !== selectedCurrency));
-      // Remove the selected currency from the options in the other dropdown
       if (selectedCurrency === baseCurrency) {
         setBaseCurrency('');
       }
@@ -109,18 +119,9 @@ export default function Home() {
   }
   
 
-  const handleButtonClick = async () => {
-    setIsLoading(true);
-    const response = await fetch(`https://localho.st:7064/api/GetExRateForecast/${baseCurrency}&${targetCurrency}`);
-    const jsonData = await response.json();
-    setData(jsonData);
-    setResult(response.status === 200 ? 'Success!' : 'An error occurred while calling the API.');
-    setIsLoading(false);
-  };
-
   const baseCurrencyOptions = baseCurrency ? [baseCurrency, ...dropdownOptions] : ['Select base currency', ...dropdownOptions];
   const targetCurrencyOptions = targetCurrency ? [targetCurrency, ...dropdownOptions] : ['Select target currency', ...dropdownOptions];
-  const isButtonDisabled = !baseCurrency || !targetCurrency || isLoading;
+  const isButtonDisabled = !baseCurrency || !targetCurrency || isLoading === 'true';
 
   return (
     <>
@@ -143,10 +144,17 @@ export default function Home() {
         </div>
         <button className={Styles.button} onClick={handleButtonClick} disabled={isButtonDisabled}>Get forecast</button>
       </div>
-      <div className={Styles.loader} style={{ display: isLoading ? 'block' : 'none' }}>
-        <Loader color={root.style.getPropertyValue('--Secondary')} size={100} />
+      <div className={Styles.result}>
+        {isLoading === 'unset' && (
+          <></>
+        ) || isLoading === 'true' && (
+          <div className={Styles.loader}>
+            <Loader color={root.style.getPropertyValue('--Secondary')} size={100} />
+          </div>
+        ) || isLoading === 'false' && (
+          <canvas className={Styles.chart} ref={canvasRef}/>
+        )}
       </div>
-      <canvas id="chart" style={{ display: isLoading ? 'none' : 'block' }} />
     </>
     );
 }
