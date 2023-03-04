@@ -19,28 +19,25 @@ export default function DarkModeToggle() {
   console.log("dark mode:", toggle);
 
   if (toggle) {
-    root.style.setProperty('--Primary', '#D9EDDF');
-    root.style.setProperty('--Secondary', '#679C76');
-    root.style.setProperty('--Tertiary', '#006B6C');
-    root.style.setProperty('--Quaternary', '#5E5E5E');
-    root.style.setProperty('--Accent', '#00FF88');
+    root.style.setProperty('--primary', '#D9EDDF');
+    root.style.setProperty('--secondary', '#679C76');
+    root.style.setProperty('--tertiary', '#006B6C');
+    root.style.setProperty('--quaternary', '#5E5E5E');
+    root.style.setProperty('--accent', '#00FF88');
     root.style.setProperty('--background', '#001900');
-    root.style.setProperty('--shadow', '#FFF');
-    root.style.setProperty('--highlight', '#FFF');
-    root.style.setProperty('--light', '#FFF');
-    root.style.setProperty('--light-hover', '#FFF');
+    root.style.setProperty('--disable', '#A9A9A9');
+    root.style.setProperty('--disable-text', '#E0E0E0');
   } else {
-    root.style.setProperty('--Primary', '#000');
-    root.style.setProperty('--Secondary', '#8FBC8F');
-    root.style.setProperty('--Tertiary', '#00CED1');
-    root.style.setProperty('--Quaternary', '#A9A9A9');
-    root.style.setProperty('--Accent', '#FFC0CB');
+    root.style.setProperty('--primary', '#000');
+    root.style.setProperty('--secondary', '#8FBC8F');
+    root.style.setProperty('--tertiary', '#00CED1');
+    root.style.setProperty('--quaternary', '#A9A9A9');
+    root.style.setProperty('--accent', '#FFC0CB');
     root.style.setProperty('--background', '#F5F5F5');
-    root.style.setProperty('--shadow', '#000');
-    root.style.setProperty('--highlight', '#000');
-    root.style.setProperty('--light', '#000');
-    root.style.setProperty('--light-hover', '#000');    
+    root.style.setProperty('--disable', '#E0E0E0');
+    root.style.setProperty('--disable-text', '#A9A9A9');
   }
+  
   
 
   return (

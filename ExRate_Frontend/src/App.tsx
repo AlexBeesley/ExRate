@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import Home from "./Pages/Home";
 import About from "./Pages/About";
+import Error from "./Pages/ErrorPage";
 import Nav from "./Components/nav";
 import DarkModeToggle from "./Components/darkmodetoggle";
 import Footer from "./Components/footer";
@@ -28,10 +29,10 @@ export const App = () => {
       </Helmet>
       {loading ? (
         <div className={Styles.loader}>
-          <Loader color={root.style.getPropertyValue('--Secondary')} size={15} />
+          <Loader color={root.style.getPropertyValue('--secondary')} size={15} />
         </div>
       ) : (
-        <>
+        <div className={Styles.main}>
           <div className={Styles.stickyContainer}>
             <Nav />
             <DarkModeToggle />
@@ -39,9 +40,10 @@ export const App = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
+            <Route path="*" element={<Error />} />
           </Routes>
           <Footer />
-        </>)}
+        </div>)}
     </BrowserRouter>
   )
 }

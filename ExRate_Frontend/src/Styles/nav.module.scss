@@ -3,7 +3,7 @@ nav {
 }
 
 .activelink {
-  color: var(--Secondary);
+  color: var(--secondary);
 }
 
 .activeicon {
@@ -15,15 +15,15 @@ nav {
 }
 
 .navicon:hover {
-  color: var(--Accent);
+  color: var(--accent);
 }
 
 .navlink {
-  color: var(--Tertiary);
+  color: var(--tertiary);
 }
 
 .navlink:hover {
-  color: var(--Accent);
+  color: var(--accent);
 }
 
 @media only screen and (max-width: 40rem) {
@@ -34,7 +34,7 @@ nav {
     display: none;
   }
   .activeicon {
-    color: var(--Secondary);
+    color: var(--secondary);
     display: inline;
   }
 

@@ -20,7 +20,8 @@ namespace ExRate_API.Controllers
             _logger.LogInformation($"Request received for baseCurrency: {baseCurrency}, targetCurrency: {targetCurrency}");
 
             var pythonListener = new GetExRateForecast();
-            var output = pythonListener.getOutput(baseCurrency, targetCurrency);
+            //var output = pythonListener.getOutputLocally(baseCurrency, targetCurrency);
+            var output = pythonListener.getOutputInContainer(baseCurrency, targetCurrency);
 
             _logger.LogInformation($"Response sent for baseCurrency: {baseCurrency}, targetCurrency: {targetCurrency}");
 

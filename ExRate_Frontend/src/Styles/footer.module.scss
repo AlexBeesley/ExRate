@@ -2,7 +2,7 @@ footer {
   position: fixed;
   bottom: 1rem;
   width: 100%;
-  color: var(--Primary);
+  color: var(--primary);
 }
 
 .iconContainer {
@@ -15,12 +15,12 @@ footer {
 
 a {
   text-decoration: none;
-  color: var(--Tertiary);
+  color: var(--tertiary);
   padding: 0.5rem;
 }
 
 a:hover {
-  color: var(--Accent);
+  color: var(--accent);
 }
 
 @media only screen and (max-width: 40rem) {  

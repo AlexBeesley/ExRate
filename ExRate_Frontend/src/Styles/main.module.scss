@@ -1,8 +1,13 @@
 @import 'variables.module.scss';
 
-body {
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+body {  
   height: 100%;
-  color: var(--Primary);
+  color: var(--primary);
   background: var(--background);
   height: 100vh;
   font-family: var(--font-family);
@@ -11,7 +16,14 @@ body {
   padding-top: 1.5rem;
   min-width: 20rem;
   overflow: hidden;
+}
 
+.main {
+  opacity: 0;
+  animation-name: fadeIn;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+  animation-timing-function: ease;
 }
 
 .loader {
@@ -25,11 +37,22 @@ body {
 h1 {
   font-weight: bold;
   position: inline;
-  color: var(--Secondary);
+  color: var(--secondary);
 }
 
 h2, h3 {
   font-weight: bold;
   position: inline;
-  color: var(--Tertiary);
+  color: var(--tertiary);
+}
+
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 90vh;
+  font-size: 3rem;
+  color: var(--error-message);
 }

@@ -79,6 +79,8 @@ export default function Home() {
             title: {
               display: true,
               text: `${baseCurrency} to ${targetCurrency} exchange rate forecast`,
+              responsive: true,
+              maintainAspectRatio: false,
             }
           }
         };      
@@ -94,11 +96,17 @@ export default function Home() {
 
   const handleButtonClick = async () => {
     setIsLoading('true');
-    const response = await fetch(`https://localho.st:7064/api/GetExRateForecast/${baseCurrency}&${targetCurrency}`);
-    const jsonData = await response.json();
-    setData(jsonData);
-    setResult(response.status === 200 ? 'Success!' : 'An error occurred while calling the API.');
-    setIsLoading('false');
+    try {
+      const response = await fetch(`https://localho.st:7064/api/GetExRateForecast/${baseCurrency}&${targetCurrency}`);
+      const jsonData = await response.json();
+      setData(jsonData);
+      setResult(response.status === 200 ? 'Success!' : 'An error occurred while calling the API.');
+      setIsLoading('false');
+    }
+    catch (error) {
+      console.error(error);
+      setIsLoading('failed');
+    }
   };
   
   const handleCurrencyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -128,14 +136,12 @@ export default function Home() {
       <h1>Welcome to ExRate</h1>
       <h2>ExRate is a web app that allows you to get the exchange rate forecast for any currency pair.</h2>
       <div className={Styles.container}>
-        <div className={Styles.dropdown}>
+        <div className={Styles.dropdowns}>
           <select id="currency1" value={baseCurrency} onChange={handleCurrencyChange}>
             {baseCurrencyOptions.map(currency => (
               <option key={currency} value={currency}>{currency}</option>
             ))}
           </select>
-        </div>
-        <div className={Styles.dropdown}>
           <select id="currency2" value={targetCurrency} onChange={handleCurrencyChange}>
             {targetCurrencyOptions.map(currency => (
               <option key={currency} value={currency}>{currency}</option>
@@ -149,10 +155,17 @@ export default function Home() {
           <></>
         ) || isLoading === 'true' && (
           <div className={Styles.loader}>
-            <Loader color={root.style.getPropertyValue('--Secondary')} size={100} />
+            <Loader color={root.style.getPropertyValue('--secondary')} size={120} />
           </div>
         ) || isLoading === 'false' && (
-          <canvas className={Styles.chart} ref={canvasRef}/>
+          <div className={Styles.chartContainer}>
+            <canvas className={Styles.chart} id="Chart" ref={canvasRef}/>
+          </div>
+        ) || isLoading === 'failed' && (
+          <div className={Styles.error}>
+            <h3>Oops! Something went wrong.</h3>
+            <p>Please try again later.</p>
+          </div>
         )}
       </div>
     </>
