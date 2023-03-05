@@ -1,35 +1,60 @@
-# Start with a base image that includes Python and .NET Core runtime
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
-RUN apt-get update && apt-get install -y python3-pip
+# Use a .NET 6 SDK image as the base image for building the API.
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS api-build
+
+# Set the working directory
+WORKDIR /app/api
+
+# Copy the .NET API files into the container
+COPY ./ExRate_API .
+
+RUN dotnet restore
+
+# Build the .NET API
+RUN dotnet publish -c Release -o out && \
+    test -f out/ExRate_API.dll
+
+
+
+
+# Use a Python 3 image as the base image for building the Python script.
+FROM python:3.10.9 AS python-build
+
+# Set the working directory
+WORKDIR /app/python
+
+RUN pip install numpy
+RUN pip install pandas
+RUN pip install requests
+RUN pip install python-dotenv
+RUN pip install tensorflow
+RUN pip install scikit-learn
+RUN pip install keras
+RUN pip install matplotlib
+
+# Copy the Python script into the container
+COPY ./ExRate_Service .
+
+
+
+
+# Use a .NET 6 runtime image as the base image for the final image.
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS final
 
 # Set the working directory
 WORKDIR /app
 
-# Copy the Python solution into the container
-COPY ExRate_Service /app/ExRate_Service
+# Copy the built API and Python script into the container
+COPY --from=api-build /app/api/out .
+COPY --from=python-build /app/python .
 
-# Install the Python dependencies
-RUN pip3 install -r ExRate_Service/requirements.txt
+# Install Python and its dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy the .NET API into the container
-COPY ExRate_API /app/ExRate_API
+# Expose the API port
+EXPOSE 80
 
-# Build the .NET API
-RUN cd ExRate_API
-EXPOSE 8000
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-WORKDIR /src
-COPY ["ExRate_API/ExRate_API.csproj", "ExRate_API/"]
-RUN dotnet restore "ExRate_API/ExRate_API.csproj"
-COPY . .
-WORKDIR "/src/ExRate_API"
-RUN dotnet build "ExRate_API.csproj" -c Release -o /app/build
-
-FROM build AS publish
-RUN dotnet publish "ExRate_API.csproj" -c Release -o /app/publish /p:UseAppHost=false
-
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+# Set the entrypoint to run the .NET API
 ENTRYPOINT ["dotnet", "ExRate_API.dll"]
-

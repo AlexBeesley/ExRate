@@ -1,18 +1,24 @@
-﻿using Newtonsoft.Json;
+﻿using ExRate_API.Controllers;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
+
 
 namespace ExRate_API.DataFromService
 {
     public class GetExRateForecast : IGetExRateForecast
     {
-        private string GetSolutionParentDirectory()
+        private readonly ILogger<GetExRateForecastController> _logger;
+
+        public GetExRateForecast(ILogger<GetExRateForecastController> logger)
         {
-            return @"C:\dev\ExRate\ExRate_Service";
+            _logger = logger;
         }
 
         public string getOutputLocally(string targetCurrency, string baseCurrency)
         {
-            var scriptPath = GetSolutionParentDirectory() + @"\Program.py";
+            var scriptPath = @"C:\dev\ExRate\ExRate_Service" + @"\Program.py";
             var scriptDirectory = Path.GetDirectoryName(scriptPath);
 
             var output = string.Empty;
@@ -53,43 +59,66 @@ namespace ExRate_API.DataFromService
 
         public string getOutputInContainer(string targetCurrency, string baseCurrency)
         {
-            var scriptPath = "/app/python_solution/Program.py";
+            _logger.LogInformation($"Container method running");
+
+            var scriptPath = "/app/Program.py";
 
             var output = string.Empty;
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "python", // Use the Python executable installed in the Docker container
+                    FileName = "python3",
                     Arguments = scriptPath + $" -b {targetCurrency} -t {baseCurrency}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-                    CreateNoWindow = true,
-                    WorkingDirectory = "/app/python_solution" // Set the working directory to the path within the container
+                    CreateNoWindow = true
                 },
                 EnableRaisingEvents = true
             };
 
-            process.ErrorDataReceived += (sender, e) => output += e.Data;
-            process.OutputDataReceived += (sender, e) => output += e.Data;
+            process.ErrorDataReceived += (sender, e) =>
+            {
+                if (!string.IsNullOrEmpty(e.Data))
+                {
+                    _logger.LogInformation($"Error from process: {e.Data}");
+                }
+            };
+            process.OutputDataReceived += (sender, e) =>
+            {
+                if (!string.IsNullOrEmpty(e.Data))
+                {
+                    _logger.LogInformation($"Output from process: {e.Data}");
+                    output += e.Data;
+                }
+            };
 
             process.Start();
             process.BeginErrorReadLine();
             process.BeginOutputReadLine();
             process.WaitForExit();
 
+            _logger.LogInformation($"Raw output: {output}");
+
             var historicalData = JsonConvert.DeserializeObject<Dictionary<string, object>>(output.Substring(0, output.IndexOf("}") + 1));
             var forecast = JsonConvert.DeserializeObject<Dictionary<string, object>>(output.Substring(output.IndexOf("}") + 1));
+
+            _logger.LogInformation($"Forecast: {JsonConvert.SerializeObject(forecast)}");
 
             var result = new Dictionary<string, Dictionary<string, object>>();
             result.Add("historicalData", historicalData ?? new Dictionary<string, object>());
             result.Add("forecast", forecast ?? new Dictionary<string, object>());
 
+            _logger.LogInformation($"Result: {JsonConvert.SerializeObject(result)}");
+
             var json = JsonConvert.SerializeObject(result, Formatting.Indented);
+
+            _logger.LogInformation($"Final JSON: {json}");
 
             return json;
         }
+
 
     }
 }
