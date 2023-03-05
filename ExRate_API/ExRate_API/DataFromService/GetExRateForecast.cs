@@ -68,7 +68,7 @@ namespace ExRate_API.DataFromService
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "/usr/local/lib/pyhton3.9",
+                    FileName = "/usr/local/lib/python3.9",
                     Arguments = scriptPath + $" -b {targetCurrency} -t {baseCurrency}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
