@@ -1,60 +1,32 @@
-# Use a .NET 6 SDK image as the base image for building the API.
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS api-build
-
-# Set the working directory
-WORKDIR /app/api
-
-# Copy the .NET API files into the container
-COPY ./ExRate_API .
-
-RUN dotnet restore
-
-# Build the .NET API
-RUN dotnet publish -c Release -o out && \
-    test -f out/ExRate_API.dll
-
-
-
-
-# Use a Python 3 image as the base image for building the Python script.
-FROM python:3.10.9 AS python-build
-
-# Set the working directory
-WORKDIR /app/python
-
-RUN pip install numpy
-RUN pip install pandas
-RUN pip install requests
-RUN pip install python-dotenv
-RUN pip install tensorflow
-RUN pip install scikit-learn
-RUN pip install keras
-RUN pip install matplotlib
-
-# Copy the Python script into the container
-COPY ./ExRate_Service .
-
-
-
-
-# Use a .NET 6 runtime image as the base image for the final image.
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS final
-
-# Set the working directory
+# Build stage
+FROM python:3.9.10-slim-buster AS build
 WORKDIR /app
 
-# Copy the built API and Python script into the container
-COPY --from=api-build /app/api/out .
-COPY --from=python-build /app/python .
+# Copy the requirements file and install dependencies
+RUN pip install numpy pandas requests python-dotenv tensorflow scikit-learn keras matplotlib
 
-# Install Python and its dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends python3 && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Copy the Python project and build it
+COPY ./ExRate_Service .
 
-# Expose the API port
+# Package stage
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS package
+WORKDIR /app
+
+# Copy the .NET 6 API and build it
+COPY ExRate_API .
+RUN dotnet publish -c Release -o out
+
+# Final stage
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS final
+WORKDIR /app
+
+# Copy the Python project and its dependencies from the build stage
+COPY --from=build /app ExRate_Service
+COPY --from=build /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
+
+# Copy the .NET 6 API from the package stage
+COPY --from=package /app/out ExRate_API
+
+# Set the entry point to start the .NET 6 API
+ENTRYPOINT ["dotnet", "ExRate_API/ExRate_API.dll"]
 EXPOSE 80
-
-# Set the entrypoint to run the .NET API
-ENTRYPOINT ["dotnet", "ExRate_API.dll"]

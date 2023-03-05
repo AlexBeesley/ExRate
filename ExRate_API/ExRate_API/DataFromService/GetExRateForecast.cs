@@ -61,14 +61,14 @@ namespace ExRate_API.DataFromService
         {
             _logger.LogInformation($"Container method running");
 
-            var scriptPath = "/app/Program.py";
+            var scriptPath = "/app/ExRate_Service/Program.py";
 
             var output = string.Empty;
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "python3",
+                    FileName = "/usr/local/lib/pyhton3.9",
                     Arguments = scriptPath + $" -b {targetCurrency} -t {baseCurrency}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
