@@ -37,3 +37,15 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
+  - job: DeployToAppService
+  displayName: Deploy to Azure App Service
+  pool:
+    vmImage: $(vmImageName)
+  steps:
+  - task: AzureWebApp@1
+    displayName: 'Deploy to Azure App Service'
+    inputs:
+      azureSubscription: 'myAzureSubscription'
+      appName: 'ExRate'
+      package: '$(containerRegistry)/$(imageRepository):$(tag)'
+      startUpCommand: ''
