@@ -14,7 +14,7 @@ payload = {}
 KEY = os.environ.get("API_KEY")
 
 headers = {
-    "apikey": KEY
+    "apikey": "7Kggh7lfPJ12j0BadbKgpSTUGJ5m8s6N"
 }
 
 
