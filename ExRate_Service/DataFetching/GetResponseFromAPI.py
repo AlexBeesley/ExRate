@@ -3,15 +3,15 @@ from dotenv import load_dotenv
 from Services import ErrorHandling
 import os
 
-if load_dotenv():
-    pass
-else:
-    raise ErrorHandling.NewException("Failed to mount dotenv. \nThe dotenv file is required as it contains the API "
-                                     "Key. \nEnsure this file is present in the root directory and try again.")
+#if load_dotenv():
+#    pass
+#else:
+#    raise ErrorHandling.NewException("Failed to mount dotenv. \nThe dotenv file is required as it contains the API "
+#                                     "Key. \nEnsure this file is present in the root directory and try again.")
 
 payload = {}
 
-KEY = os.environ.get("API_KEY")
+#KEY = os.environ.get("API_KEY")
 
 headers = {
     "apikey": "7Kggh7lfPJ12j0BadbKgpSTUGJ5m8s6N"
