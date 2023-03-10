@@ -3,7 +3,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
-
+using System.Runtime.CompilerServices;
+using System;
 
 namespace ExRate_API.DataFromService
 {
@@ -40,21 +41,9 @@ namespace ExRate_API.DataFromService
             process.ErrorDataReceived += (sender, e) => output += e.Data;
             process.OutputDataReceived += (sender, e) => output += e.Data;
 
-            process.Start();
-            process.BeginErrorReadLine();
-            process.BeginOutputReadLine();
-            process.WaitForExit();
+            processSequence(process);
 
-            var historicalData = JsonConvert.DeserializeObject<Dictionary<string, object>>(output.Substring(0, output.IndexOf("}") + 1));
-            var forecast = JsonConvert.DeserializeObject<Dictionary<string, object>>(output.Substring(output.IndexOf("}") + 1));
-
-            var result = new Dictionary<string, Dictionary<string, object>>();
-            result.Add("historicalData", historicalData ?? new Dictionary<string, object>());
-            result.Add("forecast", forecast ?? new Dictionary<string, object>());
-
-            var json = JsonConvert.SerializeObject(result, Formatting.Indented);
-
-            return json;
+            return CombineIntoJson(output);
         }
 
         public string getOutputInContainer(string targetCurrency, string baseCurrency)
@@ -92,11 +81,13 @@ namespace ExRate_API.DataFromService
                 }
             };
 
-            process.Start();
-            process.BeginErrorReadLine();
-            process.BeginOutputReadLine();
-            process.WaitForExit();
+            processSequence(process);
 
+            return CombineIntoJson(output);
+        }
+
+        private string CombineIntoJson(string output)
+        {
             var historicalData = JsonConvert.DeserializeObject<Dictionary<string, object>>(output.Substring(0, output.IndexOf("}") + 1));
             var forecast = JsonConvert.DeserializeObject<Dictionary<string, object>>(output.Substring(output.IndexOf("}") + 1));
 
@@ -108,5 +99,14 @@ namespace ExRate_API.DataFromService
 
             return json;
         }
+
+        private void processSequence(Process process)
+        {
+            process.Start();
+            process.BeginErrorReadLine();
+            process.BeginOutputReadLine();
+            process.WaitForExit();
+        }
+
     }
 }
