@@ -1,21 +1,23 @@
 import requests
-from dotenv import load_dotenv
-from Services import ErrorHandling
-import os
 
-if load_dotenv():
-   pass
-else:
-   raise ErrorHandling.NewException("Failed to mount dotenv. \nThe dotenv file is required as it contains the API "
-                                    "Key. \nEnsure this file is present in the root directory and try again.")
+from azure.identity import DefaultAzureCredential
+from azure.keyvault.secrets import SecretClient
+
+
+try:
+    credential = DefaultAzureCredential()
+    vault_url = "https://exchangerates-data.vault.azure.net/"
+    secret_name = "exchangerates-data"
+    client = SecretClient(vault_url=vault_url, credential=credential)
+except:
+    print("An issue was encountered when trying to access Azure Vault.")
 
 payload = {}
 
-KEY = os.environ.get("API_KEY")
-
 headers = {
-    "apikey": KEY
+    "apikey": client.get_secret(secret_name).value
 }
+
 
 
 def getCurrent(FROM, TO):
