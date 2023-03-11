@@ -19,26 +19,24 @@ export default function DarkModeToggle() {
   console.log("dark mode:", toggle);
 
   if (toggle) {
-    root.style.setProperty('--primary', '#D9EDDF');
-    root.style.setProperty('--secondary', '#679C76');
-    root.style.setProperty('--tertiary', '#006B6C');
-    root.style.setProperty('--quaternary', '#5E5E5E');
-    root.style.setProperty('--accent', '#00FF88');
-    root.style.setProperty('--background', '#001900');
+    root.style.setProperty('--primary', '#FFF');
+    root.style.setProperty('--secondary', '#009F76');
+    root.style.setProperty('--tertiary', '#FFF');
+    root.style.setProperty('--accent', '#4e9c87');
+    root.style.setProperty('--accent-secondary', '#FFC400');
+    root.style.setProperty('--background', '#001000');
     root.style.setProperty('--disable', '#A9A9A9');
     root.style.setProperty('--disable-text', '#E0E0E0');
   } else {
     root.style.setProperty('--primary', '#000');
-    root.style.setProperty('--secondary', '#8FBC8F');
-    root.style.setProperty('--tertiary', '#00CED1');
-    root.style.setProperty('--quaternary', '#A9A9A9');
-    root.style.setProperty('--accent', '#FFC0CB');
-    root.style.setProperty('--background', '#F5F5F5');
+    root.style.setProperty('--secondary', '#009F76');
+    root.style.setProperty('--tertiary', '#000');
+    root.style.setProperty('--accent', '#4e9c87');
+    root.style.setProperty('--accent-secondary', '#FFC400');
+    root.style.setProperty('--background', '#FFF');
     root.style.setProperty('--disable', '#E0E0E0');
     root.style.setProperty('--disable-text', '#A9A9A9');
   }
-  
-  
 
   return (
     <div className={Styles.darkmodetoggle}>

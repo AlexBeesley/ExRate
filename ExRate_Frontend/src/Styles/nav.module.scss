@@ -15,7 +15,7 @@ nav {
 }
 
 .navicon:hover {
-  color: var(--accent);
+  color: var(--accent-secondary);
 }
 
 .navlink {
@@ -23,7 +23,7 @@ nav {
 }
 
 .navlink:hover {
-  color: var(--accent);
+  color: var(--accent-secondary);
 }
 
 @media only screen and (max-width: 40rem) {
