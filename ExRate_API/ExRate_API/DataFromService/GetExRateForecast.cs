@@ -51,6 +51,9 @@ namespace ExRate_API.DataFromService
             var scriptPath = "/app/ExRate_Service/Program.py";
 
             var output = string.Empty;
+            var envVars = new Dictionary<string, string> { { "PYTHONWARNINGS", "ignore" } };
+
+
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
@@ -61,7 +64,8 @@ namespace ExRate_API.DataFromService
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     CreateNoWindow = true,
-                    WorkingDirectory = "/app/ExRate_Service/"
+                    WorkingDirectory = "/app/ExRate_Service/",
+                    EnvironmentVariables = envVars
                 },
                 EnableRaisingEvents = true
             };
