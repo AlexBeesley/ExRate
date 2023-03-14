@@ -1,23 +1,28 @@
 import requests
 
-from azure.identity import DefaultAzureCredential
+import os
+from azure.identity import DefaultAzureCredential, ClientSecretCredential
 from azure.keyvault.secrets import SecretClient
 
+vault_url = "https://exchangerates-data.vault.azure.net/"
+secret_name = "exchangerates-data"
 
-try:
+if os.environ.get("DOTNET_RUNNING_IN_CONTAINER") == "true":
+    credential = ClientSecretCredential(
+        tenant_id="8f962d2b-fa24-43d2-be9c-887d97b9e926",
+        client_id="11378dec-77e9-4b44-aa09-8d747940b005",
+        client_secret="8d77ffcf-0d2d-4e84-9a45-f871022730d6"
+    )
+else:
     credential = DefaultAzureCredential()
-    vault_url = "https://exchangerates-data.vault.azure.net/"
-    secret_name = "exchangerates-data"
-    client = SecretClient(vault_url=vault_url, credential=credential)
-except:
-    print("An issue was encountered when trying to access Azure Vault.")
+
+client = SecretClient(vault_url=vault_url, credential=credential)
 
 payload = {}
 
 headers = {
     "apikey": client.get_secret(secret_name).value
 }
-
 
 
 def getCurrent(FROM, TO):
