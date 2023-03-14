@@ -1,6 +1,6 @@
 import requests
-
 import os
+
 from azure.identity import DefaultAzureCredential, ClientSecretCredential
 from azure.keyvault.secrets import SecretClient
 

@@ -38,8 +38,20 @@ namespace ExRate_API.DataFromService
                 EnableRaisingEvents = true
             };
 
-            process.ErrorDataReceived += (sender, e) => output += e.Data;
-            process.OutputDataReceived += (sender, e) => output += e.Data;
+            process.ErrorDataReceived += (sender, e) =>
+            {
+                if (!string.IsNullOrEmpty(e.Data))
+                {
+                    _logger.LogError($"Error from process: {e.Data}");
+                }
+            };
+            process.OutputDataReceived += (sender, e) =>
+            {
+                if (!string.IsNullOrEmpty(e.Data))
+                {
+                    output += e.Data;
+                }
+            };
 
             processSequence(process);
 
@@ -107,6 +119,5 @@ namespace ExRate_API.DataFromService
             process.BeginOutputReadLine();
             process.WaitForExit();
         }
-
     }
 }

@@ -1,6 +1,5 @@
 ﻿using ExRate_API.DataFromService;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace ExRate_API.Controllers
 {

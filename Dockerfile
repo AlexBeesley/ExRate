@@ -20,5 +20,7 @@ RUN pip install numpy pandas requests python-dotenv tensorflow scikit-learn kera
 COPY ./ExRate_Service ExRate_Service
 COPY --from=package /app/out ExRate_API
 
+ENV TF_CPP_MIN_LOG_LEVEL=1
+
 ENTRYPOINT ["dotnet", "ExRate_API/ExRate_API.dll"]
 EXPOSE 80
