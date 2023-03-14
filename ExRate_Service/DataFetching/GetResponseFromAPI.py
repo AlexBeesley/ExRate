@@ -11,7 +11,7 @@ if os.environ.get("DOTNET_RUNNING_IN_CONTAINER") == "true":
     credential = ClientSecretCredential(
         tenant_id="8f962d2b-fa24-43d2-be9c-887d97b9e926",
         client_id="11378dec-77e9-4b44-aa09-8d747940b005",
-        client_secret="11378dec-77e9-4b44-aa09-8d747940b005"
+        client_secret="pgm8Q~UbwF8iT1QaJ1yE5piDeZErRmHamHngkbBK"
     )
 else:
     credential = DefaultAzureCredential()
