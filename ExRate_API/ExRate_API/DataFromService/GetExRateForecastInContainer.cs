@@ -11,42 +11,11 @@ namespace ExRate_API.DataFromService
 
         public string getOutput(string targetCurrency, string baseCurrency)
         {
+            var fileName = "/usr/bin/python3.9";
             var scriptPath = "/app/ExRate_Service/Program.py";
+            var scriptDirectory = "/app/ExRate_Service/";
 
-            var output = string.Empty;
-            var process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "/usr/bin/python3.9",
-                    Arguments = scriptPath + $" -b {targetCurrency} -t {baseCurrency}",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true,
-                    WorkingDirectory = "/app/ExRate_Service/"
-                },
-                EnableRaisingEvents = true
-            };
-
-            process.ErrorDataReceived += (sender, e) =>
-            {
-                if (!string.IsNullOrEmpty(e.Data))
-                {
-                    _logger.LogError($"Error from process: {e.Data}");
-                }
-            };
-            process.OutputDataReceived += (sender, e) =>
-            {
-                if (!string.IsNullOrEmpty(e.Data))
-                {
-                    output += e.Data;
-                }
-            };
-
-            processSequence(process);
-
-            return CombineIntoJson(output);
+            return RunProcess(fileName, scriptPath, scriptDirectory, targetCurrency, baseCurrency);
         }
     }
 }

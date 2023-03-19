@@ -12,7 +12,46 @@ namespace ExRate_API.DataFromService
         {
             _logger = logger;
         }
-        protected string CombineIntoJson(string output)
+
+        protected string RunProcess(string fileName, string scriptPath, string scriptDirectory, string targetCurrency, string baseCurrency)
+        {
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = fileName,
+                    Arguments = scriptPath + $" -b {targetCurrency} -t {baseCurrency}",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    WorkingDirectory = scriptDirectory
+                },
+                EnableRaisingEvents = true
+            };
+
+            string output = string.Empty;
+            process.ErrorDataReceived += (sender, e) =>
+            {
+                if (!string.IsNullOrEmpty(e.Data))
+                {
+                    _logger.LogError($"Error from process: {e.Data}");
+                }
+            };
+            process.OutputDataReceived += (sender, e) =>
+            {
+                if (!string.IsNullOrEmpty(e.Data))
+                {
+                    output += e.Data;
+                }
+            };
+
+            processSequence(process);
+
+            return CombineIntoJson(output);
+        }
+
+        private string CombineIntoJson(string output)
         {
             var historicalData = JsonConvert.DeserializeObject<Dictionary<string, object>>(output.Substring(0, output.IndexOf("}") + 1));
             var forecast = JsonConvert.DeserializeObject<Dictionary<string, object>>(output.Substring(output.IndexOf("}") + 1));
@@ -28,7 +67,7 @@ namespace ExRate_API.DataFromService
             return json;
         }
 
-        protected void processSequence(Process process)
+        private void processSequence(Process process)
         {
             process.Start();
             process.BeginErrorReadLine();
