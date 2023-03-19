@@ -21,7 +21,7 @@ namespace ExRate_API.Controllers
 
             var ExRateForecast = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == null
                 ? new GetExRateForecastLocally(_logger)
-                : (IGetExRateForecast) new GetExRateForecastInContainer(_logger);
+                : (IGetExRateForecast)new GetExRateForecastInContainer(_logger);
 
             var output = ExRateForecast.getOutput(baseCurrency, targetCurrency);
 

@@ -1,5 +1,4 @@
 ﻿using ExRate_API.Controllers;
-using System.Diagnostics;
 
 namespace ExRate_API.DataFromService
 {
