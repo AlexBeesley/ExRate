@@ -16,20 +16,17 @@ namespace ExRate_API.Controllers
         [HttpGet("{baseCurrency}&{targetCurrency}")]
         public IActionResult Get(string baseCurrency, string targetCurrency)
         {
-            _logger.LogInformation($"Request received for baseCurrency: {baseCurrency}, targetCurrency: {targetCurrency}");
+            _logger.LogInformation($"Request received for {nameof(baseCurrency)}: {baseCurrency} & {nameof(targetCurrency)}: {targetCurrency}");
 
-            var pythonListener = new GetExRateForecast(_logger);
-            string output;
-            if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER")))
-            {
-                output = pythonListener.getOutputLocally(baseCurrency, targetCurrency);
-            }
-            else
-            {
-                output = pythonListener.getOutputInContainer(baseCurrency, targetCurrency);
-            }
 
-            _logger.LogInformation($"Response sent for baseCurrency: {baseCurrency}, targetCurrency: {targetCurrency}");
+            var ExRateForecast = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == null
+                ? new GetExRateForecastLocally(_logger)
+                : (IGetExRateForecast) new GetExRateForecastInContainer(_logger);
+
+            var output = ExRateForecast.getOutput(baseCurrency, targetCurrency);
+
+
+            _logger.LogInformation($"Response sent for {nameof(baseCurrency)}: {baseCurrency} & {nameof(targetCurrency)}: {targetCurrency}");
 
             return Ok(output);
         }

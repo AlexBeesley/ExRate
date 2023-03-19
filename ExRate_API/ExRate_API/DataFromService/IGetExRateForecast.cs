@@ -2,7 +2,6 @@
 {
     public interface IGetExRateForecast
     {
-        string getOutputLocally(string targetCurrency, string baseCurrency);
-        string getOutputInContainer(string targetCurrency, string baseCurrency);
+        string getOutput(string targetCurrency, string baseCurrency);
     }
 }
