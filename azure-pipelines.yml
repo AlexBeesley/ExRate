@@ -29,9 +29,10 @@ stages:
       inputs:
         testSelector: 'testAssemblies'
         testAssemblyVer2: |
-          **\**\*test*.dll
-          !**\**\*TestAdapter.dll
-          !**\**\obj\**
+          **\$(BuildConfiguration)\*test*.dll
+          **\$(BuildConfiguration)\**\*test*.dll
+          !**\*Microsoft.VisualStudio.TestPlatform*
+          !**\obj\**
         searchFolder: '$(System.DefaultWorkingDirectory)'
 - stage: Build_Docker_Image_Stage
   displayName: Docker build and push stage
