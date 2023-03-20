@@ -29,7 +29,7 @@ stages:
       inputs:
         command: test
         projects: '**/**/*Tests/*.csproj'
-        arguments: '--configuration $(buildConfiguration)'
+        arguments: '--configuration **\$(BuildConfiguration)\*\*Tests*.dll'
         diagnosticsEnabled: true
   - job: Build
     displayName: Build
