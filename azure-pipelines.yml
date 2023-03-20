@@ -12,17 +12,44 @@ variables:
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
 
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
+  # Agent VM image names
+  vmImageLinux: 'ubuntu-latest'
+  vmImageWindows: 'windows-latest'
 
 stages:
-- stage: Build
-  displayName: Build and push stage
+- stage: Test_and_Build
+  displayName: Build and test stage
   jobs:
   - job: Build
     displayName: Build
     pool:
-      vmImage: $(vmImageName)
+      vmImage: $(vmImageWindows)
+    steps:
+    - task: DotNetCoreCLI@2
+      displayName: Restore
+      inputs:
+        command: restore
+        projects: '**/*.csproj'
+    - task: DotNetCoreCLI@2
+      displayName: Build
+      inputs:
+        command: build
+        projects: '**/*.csproj'
+        arguments: '--configuration $(BuildConfiguration)'
+    - task: VSTest@2
+      displayName: Test
+      inputs:
+        command: test
+        projects: '**/**/*Tests/*.csproj'
+        arguments: '--configuration $(BuildConfiguration) --filter **\*Tests.dll'
+        diagnosticsEnabled: true
+- stage: Build_Docker_Image
+  displayName: Build and push stage
+  jobs:
+  - job: Docker_Build
+    displayName: Build Docker Image
+    pool:
+      vmImage: $(vmImageLinux)
     steps:
     - task: Docker@2
       displayName: Build and push an image to container registry
