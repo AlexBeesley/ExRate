@@ -37,12 +37,12 @@ stages:
         projects: '**/*.csproj'
         arguments: '--configuration $(BuildConfiguration)'
     - task: VSTest@2
-    displayName: Test
-      inputs:
-        command: test
-        projects: '**/**/*Tests/*.csproj'
-        arguments: '--configuration $(BuildConfiguration) --filter **\*Tests.dll'
-        diagnosticsEnabled: true
+      displayName: Test
+        inputs:
+          command: test
+          projects: '**/**/*Tests/*.csproj'
+          arguments: '--configuration $(BuildConfiguration) --filter **\*Tests.dll'
+          diagnosticsEnabled: true
   - stage: Test_and_Build
     displayName: Build and push stage
     jobs:
