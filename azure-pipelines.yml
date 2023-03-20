@@ -12,21 +12,20 @@ variables:
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
 
-  # Agent VM image name
-  #vmImageName: 'ubuntu-latest'
-  vmImageName: 'windows-latest'
+  # Agent VM image names
+  vmImageLinux: 'ubuntu-latest'
+  vmImageWindows: 'windows-latest'
 
 stages:
-- stage: Build
+- stage: Test & Build
   displayName: Build and push stage
   jobs:
-  - job: Build
-    displayName: Build
+  - job: Test
+    displayName: Test
     pool:
-      vmImage: $(vmImageName)
+      vmImage: $(vmImageWindows)
     steps:
     - task: VSTest@2
-      displayName: 'Run NUnit tests'
       inputs:
         testAssemblyVer2: |
           **\$(buildConfiguration)\*Tests.dll
@@ -34,6 +33,11 @@ stages:
         configuration: '$(buildConfiguration)'
         runSettingsFile: '$(System.DefaultWorkingDirectory)/test.runsettings'
         diagnosticsEnabled: true
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageLinux)
+    steps:
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
