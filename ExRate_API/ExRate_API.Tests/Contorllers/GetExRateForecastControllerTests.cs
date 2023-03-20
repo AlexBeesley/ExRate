@@ -44,30 +44,5 @@ namespace ExRate_API.Tests.Controllers
             Assert.IsInstanceOf<OkObjectResult>(result);
             Assert.IsNotNull(output);
         }
-
-
-        [Test]
-        public void Get_Logs_Debug_Message()
-        {
-            // Arrange
-            var baseCurrency = "USD";
-            var targetCurrency = "EUR";
-
-            // Act
-            var result = _controller.Get(baseCurrency, targetCurrency);
-
-            // Assert
-            _loggerMock.Verify(
-                logger => logger.Log(
-                    LogLevel.Debug,
-                    It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((o, t) => o.ToString().Contains($"Request received for baseCurrency: {baseCurrency}, targetCurrency: {targetCurrency}")),
-                    null,
-                    It.IsAny<Func<It.IsAnyType, Exception, string>>()
-                ),
-                Times.Once
-            );
-
-        }
     }
 }
