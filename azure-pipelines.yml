@@ -20,7 +20,7 @@ stages:
 - stage: Test_and_Build
   displayName: .NET build and test stage
   jobs:
-  - job: .NET Restore, Build and Test
+  - job: .NET Test
     displayName: Restore, Build and Test
     pool:
       vmImage: $(vmImageWindows)
