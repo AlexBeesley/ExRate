@@ -33,7 +33,7 @@ namespace ExRate_API.Tests.Controllers
                 forecast = new Dictionary<DateTime, decimal>()
             };
 
-            _getExRateForecastMock.Setup(pl => pl.getOutputLocally(baseCurrency, targetCurrency)).Returns(expectedOutput.ToString() ?? string.Empty);
+            _getExRateForecastMock.Setup(pl => pl.getOutput(baseCurrency, targetCurrency)).Returns(expectedOutput.ToString() ?? string.Empty);
 
             // Act
             var result = _controller.Get(baseCurrency, targetCurrency);
