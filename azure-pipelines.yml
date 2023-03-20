@@ -24,6 +24,15 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
+    - task: VSTest@2
+      displayName: 'Run NUnit tests'
+      inputs:
+        testAssemblyVer2: |
+          **\$(buildConfiguration)\*Tests.dll
+        platform: '$(platform)'
+        configuration: '$(buildConfiguration)'
+        runSettingsFile: '$(System.DefaultWorkingDirectory)/test.runsettings'
+        diagnosticsEnabled: true
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
