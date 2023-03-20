@@ -17,10 +17,10 @@ variables:
   vmImageWindows: 'windows-latest'
 
 stages:
-- stage: Build_and_Test
+- stage: Test_Stage
   displayName: test stage
   jobs:
-  - job: .NET Test
+  - job: Build and Test
     displayName: Restore, Build and Test
     pool:
       vmImage: $(vmImageWindows)
@@ -46,7 +46,7 @@ stages:
         testRunTitle: 'API Tests'
         publishTestResults: true
         testResultsFiles: '**/TestResults.xml'
-- stage: Build_Docker_Image
+- stage: Build_Docker_Image_Stage
   displayName: Docker build and push stage
   jobs:
   - job: Docker_Build
