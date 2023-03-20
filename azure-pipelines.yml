@@ -28,7 +28,7 @@ stages:
     - task: VSTest@2
       inputs:
         command: test
-        projects: '**/*Tests/*.csproj'
+        projects: '**/**/*Tests/*.csproj'
         arguments: '--configuration $(buildConfiguration)'
         diagnosticsEnabled: true
   - job: Build
