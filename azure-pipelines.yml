@@ -25,15 +25,10 @@ stages:
     pool:
       vmImage: $(vmImageWindows)
     steps:
-    - task: VSTest@2
+    - task: DotNetCoreCLI@2
       inputs:
-        testSelector: 'testAssemblies'
-        testAssemblyVer2: |
-          **\$(BuildConfiguration)\*test*.dll
-          **\$(BuildConfiguration)\**\*test*.dll
-          !**\*Microsoft.VisualStudio.TestPlatform*
-          !**\obj\**
-        searchFolder: '$(System.DefaultWorkingDirectory)'
+        command: 'test'
+        projects: '**/*Tests.csproj'
 - stage: Build_Docker_Image_Stage
   displayName: Docker build and push stage
   jobs:
