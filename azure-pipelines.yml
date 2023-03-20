@@ -37,7 +37,7 @@ stages:
         projects: '**/*.csproj'
         arguments: '--configuration $(BuildConfiguration)'
     - task: VSTest@2
-      displayName: Test
+        displayName: Test
         inputs:
           command: test
           projects: '**/**/*Tests/*.csproj'
