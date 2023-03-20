@@ -31,13 +31,11 @@ stages:
         command: restore
         projects: '**/*.csproj'
     - task: DotNetCoreCLI@2
-      displayName: Build
       inputs:
         command: build
         projects: '**/*.csproj'
         arguments: '--configuration $(BuildConfiguration)'
     - task: VSTest@2
-    displayName: Test
       inputs:
         command: test
         projects: '**/**/*Tests/*.csproj'
