@@ -28,9 +28,8 @@ stages:
     - task: VSTest@2
       inputs:
         command: test
-        projects: ExRate_API.Tests\ExRate_API.Tests.csproj
-        configuration: '$(buildConfiguration)'
-        runSettingsFile: '$(System.DefaultWorkingDirectory)/test.runsettings'
+        projects: '**/*Tests/*.csproj'
+        arguments: '--configuration $(buildConfiguration)'
         diagnosticsEnabled: true
   - job: Build
     displayName: Build
