@@ -23,7 +23,7 @@ stages:
   - job: Test
     displayName: Test
     pool:
-      vmImage: $(vmImageWindows)
+      vmImage: $(vmImageLinux)
     steps:
     - task: DotNetCoreCLI@2
       inputs:
