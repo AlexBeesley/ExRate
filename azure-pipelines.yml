@@ -20,6 +20,22 @@ stages:
 - stage: Test_and_Build
   displayName: Build and push stage
   jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageWindows)
+    steps:
+    - task: DotNetCoreCLI@2
+      displayName: Restore
+      inputs:
+        command: restore
+        projects: '**/*.csproj'
+    - task: DotNetCoreCLI@2
+      displayName: Build
+      inputs:
+        command: build
+        projects: '**/*.csproj'
+        arguments: '--configuration $(BuildConfiguration)'
   - job: Test
     displayName: Test
     pool:
@@ -29,10 +45,10 @@ stages:
       inputs:
         command: test
         projects: '**/**/*Tests/*.csproj'
-        arguments: '--configuration **\$(BuildConfiguration)\*\*Tests*.dll'
+        arguments: '--configuration $(BuildConfiguration) --filter **\*Tests.dll'
         diagnosticsEnabled: true
-  - job: Build
-    displayName: Build
+  - job: Docker_Build
+    displayName: Build Docker Image
     pool:
       vmImage: $(vmImageLinux)
     steps:
