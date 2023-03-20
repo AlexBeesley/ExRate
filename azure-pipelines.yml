@@ -20,7 +20,7 @@ stages:
 - stage: Test_Stage
   displayName: test stage
   jobs:
-  - job: Build and Test
+  - job: Build_and_Test
     displayName: Restore, Build and Test
     pool:
       vmImage: $(vmImageWindows)
