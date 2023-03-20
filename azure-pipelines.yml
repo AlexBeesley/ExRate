@@ -18,34 +18,21 @@ variables:
 
 stages:
 - stage: Test_Stage
-  displayName: test stage
+  displayName: Test Stage
   jobs:
-  - job: Build_and_Test
-    displayName: Restore, Build and Test
+  - job: Test
+    displayName: Test
     pool:
       vmImage: $(vmImageWindows)
     steps:
-    - task: DotNetCoreCLI@2
-      displayName: Restore
+    - task: VSTest@2
       inputs:
-        command: restore
-        projects: '**/*.csproj'
-    - task: DotNetCoreCLI@2
-      displayName: Build
-      inputs:
-        command: build
-        projects: '**/*.csproj'
-        arguments: '--configuration $(BuildConfiguration)'
-    - task: DotNetCoreCLI@2
-      displayName: 'Test'
-      inputs:
-        command: test
-        projects: '**/*Test.csproj'
-        arguments: '--configuration $(buildConfiguration)'
-        workingDirectory: '$(System.DefaultWorkingDirectory)'
-        testRunTitle: 'API Tests'
-        publishTestResults: true
-        testResultsFiles: '**/TestResults.xml'
+        testSelector: 'testAssemblies'
+        testAssemblyVer2: |
+          **\*test*.dll
+          !**\*TestAdapter.dll
+          !**\obj\**
+        searchFolder: '$(System.DefaultWorkingDirectory)'
 - stage: Build_Docker_Image_Stage
   displayName: Docker build and push stage
   jobs:
