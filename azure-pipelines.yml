@@ -17,7 +17,7 @@ variables:
   vmImageWindows: 'windows-latest'
 
 stages:
-- stage: Test & Build
+- stage: Test_and_Build
   displayName: Build and push stage
   jobs:
   - job: Test
