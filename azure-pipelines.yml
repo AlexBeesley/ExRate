@@ -17,8 +17,8 @@ variables:
   vmImageWindows: 'windows-latest'
 
 stages:
-- stage: Test_and_Build
-  displayName: .NET build and test stage
+- stage: Build_and_Test
+  displayName: test stage
   jobs:
   - job: .NET Test
     displayName: Restore, Build and Test
