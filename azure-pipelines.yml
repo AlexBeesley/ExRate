@@ -27,9 +27,8 @@ stages:
     steps:
     - task: VSTest@2
       inputs:
-        testAssemblyVer2: |
-          **\$(buildConfiguration)\*Tests.dll
-        platform: '$(platform)'
+        command: test
+        projects: ExRate_API.Tests\ExRate_API.Tests.csproj
         configuration: '$(buildConfiguration)'
         runSettingsFile: '$(System.DefaultWorkingDirectory)/test.runsettings'
         diagnosticsEnabled: true
