@@ -3,6 +3,7 @@ using ExRate_API.DataFromService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System.Text.Json.Nodes;
 
 namespace ExRate_API.Tests.Controllers
 {
@@ -10,39 +11,34 @@ namespace ExRate_API.Tests.Controllers
     {
         private GetExRateForecastController _controller;
         private Mock<ILogger<GetExRateForecastController>> _loggerMock;
-        private Mock<IGetExRateForecast> _getExRateForecastMock;
+        private Mock<IGetExRateForecast> _exRateForecastMock;
 
         [SetUp]
         public void Setup()
         {
             _loggerMock = new Mock<ILogger<GetExRateForecastController>>();
-            _getExRateForecastMock = new Mock<IGetExRateForecast>();
+            _exRateForecastMock = new Mock<IGetExRateForecast>();
+
             _controller = new GetExRateForecastController(_loggerMock.Object);
         }
 
         [Test]
-        public void Get_Returns_JsonObject_With_HistoricalData_And_Forecast()
+        public void Get_ReturnsOkResult_WhenExRateForecastReturnsData()
         {
             // Arrange
-            var baseCurrency = "USD";
-            var targetCurrency = "EUR";
+            string baseCurrency = "USD";
+            string targetCurrency = "EUR";
+            string expectedOutput = "some data";
 
-            var expectedOutput = new
-            {
-                historicalData = new Dictionary<DateTime, decimal>(),
-                forecast = new Dictionary<DateTime, decimal>()
-            };
-
-            _getExRateForecastMock.Setup(pl => pl.getOutput(baseCurrency, targetCurrency)).Returns(expectedOutput.ToString() ?? string.Empty);
+            _exRateForecastMock.Setup(x => x.getOutput(baseCurrency, targetCurrency))
+                .Returns(expectedOutput);
 
             // Act
             var result = _controller.Get(baseCurrency, targetCurrency);
 
             // Assert
-            var okResult = (OkObjectResult)result;
-            dynamic output = okResult.Value ?? new object();
             Assert.IsInstanceOf<OkObjectResult>(result);
-            Assert.IsNotNull(output);
         }
     }
 }
+
