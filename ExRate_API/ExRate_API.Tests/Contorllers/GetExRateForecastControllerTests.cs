@@ -17,10 +17,8 @@ namespace ExRate_API.Tests.Controllers
         [SetUp]
         public void Setup()
         {
-            // Create a mock logger object
+            // Arange
             _loggerMock = new Mock<ILogger<GetExRateForecastController>>();
-
-            // Create an instance of the controller with the mock logger
             _controller = new GetExRateForecastController(_loggerMock.Object);
         }
 
