@@ -3,7 +3,6 @@ import Styles from "../Styles/footer.module.scss";
 export default function Footer () {
     return (
         <footer className={Styles.footer}>
-        <p>&copy; 2023 Alexander Beesley</p>
             <div className={Styles.iconContainer}>
                 <a href="mailto:david.beesley1234@gmail.com" 
                 title="Email"><i className="fa-solid fa-envelope"></i></a>
@@ -14,6 +13,7 @@ export default function Footer () {
                 <a href="https://github.com/AlexBeesley" target="_blank" rel="noreferrer"
                 title="GitHub"><i className="fa-brands fa-github"></i></a>
             </div>
+            <p>&copy; 2023 Alexander Beesley</p>
         </footer>
     )
 }

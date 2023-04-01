@@ -1,5 +1,7 @@
 nav {
   display: absolute;
+  margin-left: 10%;
+  margin-right: 10%;
 }
 
 .activelink {
@@ -28,7 +30,8 @@ nav {
 
 @media only screen and (max-width: 40rem) {
   nav{
-
+    margin-left: 5%;
+    margin-right: 5%;
   }
   .activelink {
     display: none;

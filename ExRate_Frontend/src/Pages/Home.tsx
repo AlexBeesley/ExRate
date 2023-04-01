@@ -131,11 +131,22 @@ export default function Home() {
   const targetCurrencyOptions = targetCurrency ? [targetCurrency, ...dropdownOptions] : ['Select target currency', ...dropdownOptions];
   const isButtonDisabled = !baseCurrency || !targetCurrency || isLoading === 'true';
 
+
+  //dirty style hack I know...
+  if (isLoading !== 'unset') {
+    let container = document.getElementById('container');
+    if (container !== null) {
+      container.style.marginBottom = '0';
+    }
+  }
+
   return (
     <>
-      <h1>Welcome to ExRate</h1>
-      <h2>ExRate is a web app that allows you to get the exchange rate forecast for any currency pair.</h2>
-      <div className={Styles.container}>
+      <div className={Styles.title}>
+        <h1>Welcome to ExRate</h1>
+        <h2>ExRate is a web app that allows you to get the exchange rate forecast for any currency pair.</h2>
+      </div>
+      <div className={Styles.container} id="container">
         <div className={Styles.dropdowns}>
           <select id="currency1" value={baseCurrency} onChange={handleCurrencyChange}>
             {baseCurrencyOptions.map(currency => (
