@@ -1,6 +1,7 @@
 import Styles from "../Styles/footer.module.scss";
 
 export default function Footer () {
+    const currentYear = new Date().getFullYear();
     return (
         <footer className={Styles.footer}>
             <div className={Styles.iconContainer}>
@@ -13,7 +14,7 @@ export default function Footer () {
                 <a href="https://github.com/AlexBeesley" target="_blank" rel="noreferrer"
                 title="GitHub"><i className="fa-brands fa-github"></i></a>
             </div>
-            <p>&copy; 2023 Alexander Beesley</p>
+            <p>&copy; {currentYear} David (Alexander) Beesley</p>
         </footer>
     )
 }
