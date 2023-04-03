@@ -17,15 +17,18 @@
 }
 
 .dropdowns {
-    display: inline-block;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    width: 30rem;
 
     select {
         display: inline-block;
+        text-align: center;
         padding: 1rem;
         width: 14rem;
         font-size: 1.2rem;
-        text-align: center;
-        margin-left: 0.5rem;
         border: 0.2rem solid var(--primary);
         border-radius: 0.5rem;
         background: var(--secondary);

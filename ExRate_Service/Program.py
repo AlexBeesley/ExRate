@@ -1,7 +1,6 @@
 import argparse
 import os
 import numpy as np
-import tensorflow as tf
 
 from pandas import *
 from DataFetching.ProcessDataFromResponse import ProcessDataFromResponse
@@ -39,7 +38,6 @@ def run_app(base, target, hasArgs):
         inputs = np.array([normalized_rates[i:i + 7] for i in range(len(normalized_rates) - 7)])
         inputs = inputs.reshape(-1, 7, 1)
         outputs = normalized_rates[7:]
-        print(inputs.shape)
 
         model.compile(loss='mean_squared_error', optimizer='adam')
         model.fit(inputs, outputs, epochs=epochs, batch_size=batch_size, verbose=0)

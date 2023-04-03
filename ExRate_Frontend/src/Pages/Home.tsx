@@ -17,7 +17,7 @@ export default function Home() {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    const currencies = ["USD", "EUR", "JPY", "GBP", "AUD", "CAD", "CHF", "CNH", "HKD", "NZD"];
+    const currencies = ['USD', 'EUR', 'JPY', 'GBP', 'AUD', 'CAD', 'CHF', 'CNH', 'HKD', 'NZD'];
     setCurrencies(currencies);
   }, []);
   
@@ -75,7 +75,7 @@ export default function Home() {
   const handleButtonClick = async () => {
     setIsLoading('true');
     try {
-      const response = await fetch(`http://localho.st:7064/api/GetExRateForecast/${baseCurrency}&${targetCurrency}`);
+      const response = await fetch(`https://exrate.azurewebsites.net/api/GetExRateForecast/${baseCurrency}&${targetCurrency}`);
       const jsonData = await response.json();
       setData(jsonData);
       setResult(response.status === 200 ? 'Success!' : 'An error occurred while calling the API.');
