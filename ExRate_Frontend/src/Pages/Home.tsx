@@ -17,30 +17,8 @@ export default function Home() {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    fetch('/Data/currency_codes.csv')
-      .then(response => response.text())
-      .then(data => {
-        const rows = data.split('\n').slice(1);
-        const currencies = rows
-          .map(row => row.split(',')[2].trim())
-          .filter((currency, index, self) => currency.length > 0 && index === self.indexOf(currency))
-          .sort((a, b) => {
-            const topCurrencies = ['USD', 'GBP', 'EUR', 'CAD', 'AUD', 'NZD'];
-            const aIndex = topCurrencies.indexOf(a);
-            const bIndex = topCurrencies.indexOf(b);
-            if (aIndex === -1 && bIndex === -1) {
-              return a.localeCompare(b);
-            } else if (aIndex === -1) {
-              return 1;
-            } else if (bIndex === -1) {
-              return -1;
-            } else {
-              return aIndex - bIndex;
-            }
-          });
-        setCurrencies(currencies);
-      })
-      .catch(error => console.error(error));
+    const currencies = ["USD", "EUR", "JPY", "GBP", "AUD", "CAD", "CHF", "CNH", "HKD", "NZD"];
+    setCurrencies(currencies);
   }, []);
   
 
