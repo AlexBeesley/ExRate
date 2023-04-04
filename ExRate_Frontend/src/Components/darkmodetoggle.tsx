@@ -27,6 +27,8 @@ export default function DarkModeToggle() {
     root.style.setProperty('--background', '#001000');
     root.style.setProperty('--disable', '#A9A9A9');
     root.style.setProperty('--disable-text', '#E0E0E0');
+    root.style.setProperty('--code', '#937CE3');
+    root.style.setProperty('--code-background', '#ffffff15');
   } else {
     root.style.setProperty('--primary', '#000');
     root.style.setProperty('--secondary', '#009F76');
@@ -36,6 +38,8 @@ export default function DarkModeToggle() {
     root.style.setProperty('--background', '#FFF');
     root.style.setProperty('--disable', '#E0E0E0');
     root.style.setProperty('--disable-text', '#A9A9A9');
+    root.style.setProperty('--code', '#937CE3');
+    root.style.setProperty('--code-background', '#00000015');
   }
 
   return (

@@ -1,0 +1,50 @@
+.aboutContent {
+    margin-left: 10%;
+    margin-right: 10%;
+    text-align: left;
+    font-size: 1.2rem;
+    
+    h1 {
+        margin-bottom: -1rem;
+    }
+    
+    h2 {
+        margin-top: 3rem;
+        color: var(--secondary);
+    }
+    
+    a {
+        margin: 0;
+        padding: 0;
+        color: var(--accent);
+    }
+
+    table {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 100%;
+        border: 1px solid #ddd;
+        thead {
+            background-color: var(--secondary);
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border: 1px solid var(--accent);;
+        }
+    }
+    
+    code {
+        font-family: 'Source Code Pro';
+        font-size: 1.2rem;
+        background: var(--code-background);
+        color: var(--code);
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        padding-top: 0.2rem;
+        padding-bottom: 0.2rem;
+        border-radius: 2rem;
+    }
+}

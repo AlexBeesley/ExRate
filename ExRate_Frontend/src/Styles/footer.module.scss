@@ -1,13 +1,11 @@
 footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
   padding-left: 10%;
   padding-right: 10%;
   color: var(--primary);
 }
 
 .iconContainer {
+  width: 10rem;
   position: relative;
   top: 2.8rem;
   left: 80%;

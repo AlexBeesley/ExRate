@@ -33,16 +33,16 @@ export const App = () => {
         </div>
       ) : (
         <div className={Styles.main}>
-          <div className={Styles.stickyContainer}>
-            <Nav />
-            <DarkModeToggle />
+          <Nav />
+          <DarkModeToggle />
+          <div className={Styles.flexWrapper}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="*" element={<Error />} />
+            </Routes>
+            <Footer />
           </div>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="*" element={<Error />} />
-          </Routes>
-          <Footer />
         </div>)}
     </BrowserRouter>
   )

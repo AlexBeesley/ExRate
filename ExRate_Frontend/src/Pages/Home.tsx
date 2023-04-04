@@ -20,12 +20,11 @@ export default function Home() {
     const currencies = ['USD', 'EUR', 'JPY', 'GBP', 'AUD', 'CAD', 'CHF', 'CNH', 'HKD', 'NZD'];
     setCurrencies(currencies);
   }, []);
-  
 
   useEffect(() => {
     setDropdownOptions(currencies);
   }, [currencies]);
-  
+
   useEffect(() => {
     if (data) {
       setTimeout(() => {
@@ -61,16 +60,28 @@ export default function Home() {
               maintainAspectRatio: false,
             }
           }
-        };      
+        };
         const chartConfig = {
           type: 'line',
           data: chartData,
           options: options,
         };
-        new Chart(chartElement, chartConfig);
+        const myChart = new Chart(chartElement, chartConfig);
+
+        const resizeChart = () => {
+          myChart.resize();
+        };
+
+        window.addEventListener('resize', resizeChart);
+
+        return () => {
+          window.removeEventListener('resize', resizeChart);
+        };
+
       }, 10);
     }
   }, [data]);
+
 
   const handleButtonClick = async () => {
     setIsLoading('true');
@@ -78,7 +89,8 @@ export default function Home() {
       const response = await fetch(`https://exrate.azurewebsites.net/api/GetExRateForecast/${baseCurrency}&${targetCurrency}`);
       const jsonData = await response.json();
       setData(jsonData);
-      setResult(response.status === 200 ? 'Success!' : 'An error occurred while calling the API.');
+      setResult(response.status === 200 ? 'Success!' : 'An error occurred while calling the API. Status code: ' + response.status);
+      console.log(result);
       setIsLoading('false');
     }
     catch (error) {
@@ -86,7 +98,7 @@ export default function Home() {
       setIsLoading('failed');
     }
   };
-  
+
   const handleCurrencyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCurrency = event.target.value;
     if (event.target.id === 'currency1') {
@@ -103,7 +115,7 @@ export default function Home() {
       }
     }
   }
-  
+
 
   const baseCurrencyOptions = baseCurrency ? [baseCurrency, ...dropdownOptions] : ['Select base currency', ...dropdownOptions];
   const targetCurrencyOptions = targetCurrency ? [targetCurrency, ...dropdownOptions] : ['Select target currency', ...dropdownOptions];
@@ -119,7 +131,7 @@ export default function Home() {
   }
 
   return (
-    <>
+    <div className={Styles.homeContent}>
       <div className={Styles.title}>
         <h1>Welcome to ExRate</h1>
         <h2>ExRate is a web app that allows you to get the exchange rate forecast for any currency pair.</h2>
@@ -148,7 +160,7 @@ export default function Home() {
           </div>
         ) || isLoading === 'false' && (
           <div className={Styles.chartContainer}>
-            <canvas className={Styles.chart} id="Chart" ref={canvasRef}/>
+            <canvas className={Styles.chart} id="Chart" ref={canvasRef} />
           </div>
         ) || isLoading === 'failed' && (
           <div className={Styles.error}>
@@ -157,6 +169,6 @@ export default function Home() {
           </div>
         )}
       </div>
-    </>
-    );
+    </div>
+  );
 }
