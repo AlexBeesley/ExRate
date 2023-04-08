@@ -1,74 +1,86 @@
 import argparse
 import os
 import numpy as np
-
-from pandas import *
+from pandas import read_csv
 from DataFetching.ProcessDataFromResponse import ProcessDataFromResponse
 from DataVisualisation import GenerateGraphFromData
-from MachineLearning.LSTMModel import LSTMModel
-from MachineLearning.NormalizeData import NormalizeData
+from MachineLearning.DataNormaliser import DataNormaliser
+from MachineLearning.ModelManager import ModelManager
+from MachineLearning.Models.FCNN import FCNN
+from MachineLearning.Models.LSTM import LSTM
 
 # INFO log level messages not printed, set to 0 to enable INFO logs
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 
-data = read_csv("Assets/currency_codes.csv")
-abvs = data['AlphabeticCode'].tolist()
 
-input_shape = (7, 1)
-units = 64
-epochs = 100
-batch_size = 16
+def main(base, target, model_type, has_args):
+    abvs = read_currency_codes()
 
-
-def GetUserInputs():
-    base = input("""Please provide a base currency: """)
-    target = input("""Please provide a target currency: """)
-    return base, target
-
-
-def run_app(base, target, hasArgs):
     if target in abvs and base in abvs:
-        forecaster = ProcessDataFromResponse(base=base, target=target)
-        wrates, wdates, yrates, ydates = forecaster.process()
+        response_data = ProcessDataFromResponse(base=base, target=target)
+        wrates, wdates, yrates, ydates = response_data.process()
 
-        normalizer = NormalizeData()
-        normalized_rates = normalizer.normalize(yrates)
+        normaliser = DataNormaliser()
+        normalised_rates = normaliser.normalise(yrates)
 
-        model = LSTMModel(units=units, input_shape=input_shape)
-        inputs = np.array([normalized_rates[i:i + 7] for i in range(len(normalized_rates) - 7)])
+        inputs = np.array([normalised_rates[i:i + 7] for i in range(len(normalised_rates) - 7)])
         inputs = inputs.reshape(-1, 7, 1)
-        outputs = normalized_rates[7:]
+        outputs = normalised_rates[7:]
 
-        model.compile(loss='mean_squared_error', optimizer='adam')
-        model.fit(inputs, outputs, epochs=epochs, batch_size=batch_size, verbose=0)
+        if model_type.lower() == 'fcnn':
+            selected_model = FCNN(inputs.shape)
+        elif model_type.lower() == 'lstm':
+            lstm_input_shape = (inputs.shape[1], inputs.shape[2])
+            selected_model = LSTM(lstm_input_shape)
+            inputs = np.reshape(inputs, (-1, inputs.shape[1], inputs.shape[2]))
+        else:
+            raise ValueError("Invalid model type. Please use 'FCNN' or 'LSTM'.")
 
-        prediction = model.predict(inputs[-1].reshape(1, 7, 1), verbose=0)
-        prediction = normalizer.denormalize(prediction)
-        prediction = [item for sublist in prediction for item in sublist]
+        manager = ModelManager(base=base, target=target, model_type=model_type, model=selected_model.get_model())
+        model, predictions, mae = manager.predict(inputs)
 
-        if hasArgs:
-            historicalData = dict(zip(ydates, yrates))
-            forecast = dict(zip(wdates, prediction))
-            print(historicalData)
+        last_input = inputs[-1]
+        forecast = []
+        for i in range(7):
+            prediction = model.predict(last_input.reshape(1, 7, 1), verbose=0)
+            prediction = normaliser.denormalise(prediction)
+            forecast.append(prediction[0][0])
+            last_input = np.roll(last_input, -1, axis=0)
+            last_input[-1] = prediction
+
+        forecast = [item if not hasattr(item, '__iter__') else [subitem for subitem in item] for item in forecast]
+
+        if has_args:
+            historical_data = dict(zip(ydates, yrates))
+            forecast = dict(zip(wdates[-7:], forecast))
+            print(historical_data)
             print(forecast)
         else:
             print("Accuracy: ", model.evaluate(inputs, outputs))
             print(f"Actual: {wrates}")
-            print(f"Forecast: {prediction}")
-            GenerateGraphFromData.generateGraphWithForecast(yrates, ydates, prediction, base, target)
+            print(f"Forecast: {forecast}")
+            GenerateGraphFromData.generateGraphWithForecast(yrates, ydates, forecast, base, target)
     else:
         print("Try again; please provide a correct currency abbreviation. e.g. GBP, USD, EUR etc.")
+
+
+def read_currency_codes():
+    data = read_csv("Assets/currency_codes.csv")
+    return data['AlphabeticCode'].tolist()
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='ExRate')
     parser.add_argument('-b', '--base', type=str, help='Base currency')
     parser.add_argument('-t', '--target', type=str, help='Target currency')
+    parser.add_argument('-m', '--model', type=str, help='Model type (FCNN or LSTM)')
     args = parser.parse_args()
 
-    if args.base and args.target:
-        run_app(args.base.upper(), args.target.upper(), True)
+    if args.base and args.target and args.model:
+        main(args.base.upper(), args.target.upper(), args.model.upper(), True)
     else:
         print("Welcome to ExRate")
-        base, target = GetUserInputs()
-        run_app(base.upper(), target.upper(), False)
+        base = input("Please provide a base currency and target currency: ")
+        target = input("Please provide a target currency: ")
+        model_type = input("Please provide a model type (FCNN or LSTM): ")
+        main(base.upper(), target.upper(), model_type.upper(), False)
