@@ -39,9 +39,9 @@ From the `/ExRate_Service` directory, run the script with user input from the co
 
 and without user input, run:
 
-`py Program.py -b [BASE_CURRENCY] -t [TARGET_CURRENCY]`
+`py Program.py -b [BASE_CURRENCY] -t [TARGET_CURRENCY] -m [MODEL_TYPE]`
 
-Where `BASE_CURRENCY` and `TARGET_CURRENCY` are  3-letter currency codes.
+Where `BASE_CURRENCY` and `TARGET_CURRENCY` are  3-letter currency codes. `MODEL_TYPE` lets you choose between using an FCNN or LSTM model.
 
 A list of acceptable currencies can be found in the `ExRate_Service/Assets/currency_codes.csv` file.
 # ExRate API
