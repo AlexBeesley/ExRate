@@ -2,6 +2,6 @@
 {
     public interface IGetExRateForecast
     {
-        string getOutput(string targetCurrency, string baseCurrency);
+        string GetOutput(string targetCurrency, string baseCurrency, string modelType);
     }
 }

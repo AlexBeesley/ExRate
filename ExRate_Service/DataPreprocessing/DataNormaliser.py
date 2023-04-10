@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 
+
 class DataNormaliser:
     def __init__(self):
         self.scaler = MinMaxScaler()

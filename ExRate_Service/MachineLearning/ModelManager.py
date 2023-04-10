@@ -1,18 +1,15 @@
 import numpy as np
-from keras.models import Sequential
-from keras.layers import Dense
 from sklearn.preprocessing import MinMaxScaler
 from keras.callbacks import EarlyStopping
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_absolute_error
-
 from MachineLearning.Models.FCNN import FCNN
 from MachineLearning.Models.LSTM import LSTM
 
 
 class ModelManager:
 
-    def __init__(self, base, target, model_type, model=None, units=64, input_shape=(7, 1), epochs=50, batch_size=32):
+    def __init__(self, base, target, model_type, model=None, units=128, input_shape=(7, 1), epochs=100, batch_size=16):
         self.base = base
         self.target = target
         self.model_type = model_type.lower()
@@ -53,12 +50,12 @@ class ModelManager:
                             epochs=self.epochs,
                             batch_size=self.batch_size,
                             validation_data=(X_test, y_test),
-                            callbacks=[EarlyStopping(monitor='val_loss', patience=10)],
+                            callbacks=[EarlyStopping(monitor='val_loss', patience=75)],
                             verbose=0)
         return model, history
 
-    def predict(self, inputs):
-        X_train, X_test, y_train, y_test = self.process_data(inputs)
+    def predict(self, rates):
+        X_train, X_test, y_train, y_test = self.process_data(rates)
         model = self.create_model()
         model, history = self.train_model(X_train, X_test, y_train, y_test, model)
 
@@ -67,7 +64,7 @@ class ModelManager:
                                   self.scaler.inverse_transform(test_predictions))
 
         forecast = []
-        input_sequence = inputs[-1].reshape(1, 7, 1)
+        input_sequence = rates[-1].reshape(1, 7, 1)
         for i in range(7):
             prediction = model.predict(input_sequence, verbose=0)
             forecast.append(prediction[0][0])
@@ -77,9 +74,3 @@ class ModelManager:
         forecast = self.scaler.inverse_transform(np.array(forecast).reshape(-1, 1))
 
         return model, forecast, mae
-
-
-
-
-
-

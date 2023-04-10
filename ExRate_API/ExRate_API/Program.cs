@@ -1,3 +1,5 @@
+using ExRate_API.DataFromService;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -15,6 +17,14 @@ builder.Services.AddCors(options =>
         });
 });
 
+if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == null)
+{
+    builder.Services.AddSingleton<IGetExRateForecast, GetExRateForecastLocally>();
+}
+else
+{
+    builder.Services.AddSingleton<IGetExRateForecast, GetExRateForecastInContainer>();
+}
 
 var app = builder.Build();
 

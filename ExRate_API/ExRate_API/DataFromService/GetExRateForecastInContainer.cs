@@ -8,13 +8,13 @@ namespace ExRate_API.DataFromService
         {
         }
 
-        public string getOutput(string targetCurrency, string baseCurrency)
+        public string GetOutput(string targetCurrency, string baseCurrency, string modelType)
         {
             var fileName = "/usr/bin/python3.9";
             var scriptPath = "/app/ExRate_Service/Program.py";
             var scriptDirectory = "/app/ExRate_Service/";
 
-            return RunProcess(fileName, scriptPath, scriptDirectory, targetCurrency, baseCurrency);
+            return RunProcess(fileName, scriptPath, scriptDirectory, targetCurrency, baseCurrency, modelType);
         }
     }
 }

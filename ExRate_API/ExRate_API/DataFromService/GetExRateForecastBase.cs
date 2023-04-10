@@ -13,14 +13,14 @@ namespace ExRate_API.DataFromService
             _logger = logger;
         }
 
-        protected string RunProcess(string fileName, string scriptPath, string scriptDirectory, string targetCurrency, string baseCurrency)
+        protected string RunProcess(string fileName, string scriptPath, string scriptDirectory, string targetCurrency, string baseCurrency, string modelType)
         {
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = fileName,
-                    Arguments = scriptPath + $" -b {targetCurrency} -t {baseCurrency}",
+                    Arguments = scriptPath + $" -b {targetCurrency} -t {baseCurrency} -m {modelType}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,

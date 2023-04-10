@@ -8,25 +8,22 @@ namespace ExRate_API.Controllers
     public class GetExRateForecastController : ControllerBase
     {
         private readonly ILogger<GetExRateForecastController> _logger;
-        public GetExRateForecastController(ILogger<GetExRateForecastController> logger)
+        private readonly IGetExRateForecast _ExRateForecast;
+
+        public GetExRateForecastController(ILogger<GetExRateForecastController> logger, IGetExRateForecast ExRateForecast)
         {
             _logger = logger;
+            _ExRateForecast = ExRateForecast;
         }
 
-        [HttpGet("{baseCurrency}&{targetCurrency}")]
-        public IActionResult Get(string baseCurrency, string targetCurrency)
+        [HttpGet("forecast")]
+        public IActionResult Get([FromQuery] string baseCurrency, [FromQuery] string targetCurrency, [FromQuery] string modelType)
         {
-            _logger.LogInformation($"Request received for {nameof(baseCurrency)}: {baseCurrency} & {nameof(targetCurrency)}: {targetCurrency}");
+            _logger.LogInformation($"Request received for {nameof(baseCurrency)}: {baseCurrency} & {nameof(targetCurrency)}: {targetCurrency} with model: {modelType}");
 
+            var output = _ExRateForecast.GetOutput(baseCurrency, targetCurrency, modelType);
 
-            var ExRateForecast = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == null
-                ? new GetExRateForecastLocally(_logger)
-                : (IGetExRateForecast)new GetExRateForecastInContainer(_logger);
-
-            var output = ExRateForecast.getOutput(baseCurrency, targetCurrency);
-
-
-            _logger.LogInformation($"Response sent for {nameof(baseCurrency)}: {baseCurrency} & {nameof(targetCurrency)}: {targetCurrency}");
+            _logger.LogInformation($"Response sent for {nameof(baseCurrency)}: {baseCurrency} & {nameof(targetCurrency)}: {targetCurrency} with model: {modelType}");
 
             return Ok(output);
         }

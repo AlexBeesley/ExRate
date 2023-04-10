@@ -1,5 +1,5 @@
 import datetime
-from DataFetching import GetResponseFromAPI
+from DataPreprocessing.GetResponseFromAPI import GetResponseFromAPI
 
 
 class ProcessDataFromResponse:
@@ -14,12 +14,13 @@ class ProcessDataFromResponse:
         self.week_dates = []
 
     def toLists(self, rates, dates, start_date, response, days):
-        count = 0
-        while count < days:
-            working_date = (start_date + datetime.timedelta(days=count)).strftime("%Y-%m-%d")
-            rates.append(response['rates'][working_date][self.target])
-            dates.append(working_date)
-            count += 1
+        for i in range(days):
+            working_date = (start_date + datetime.timedelta(days=i)).strftime('%Y-%m-%d')
+            if response and 'rates' in response and working_date in response['rates']:
+                rates.append(response['rates'][working_date][self.target])
+                dates.append(working_date)
+            else:
+                print(f"Warning: Data for {working_date} not available.")
 
     def process(self):
         week_end_date = datetime.datetime.now()
@@ -28,10 +29,10 @@ class ProcessDataFromResponse:
         year_end_date = datetime.datetime.now() - datetime.timedelta(days=self.days_in_a_week)
         year_start_date = year_end_date - datetime.timedelta(days=self.days_in_a_year)
 
-        week_response = GetResponseFromAPI.getTimeSeries(self.base, self.target, week_start_date.strftime("%Y-%m-%d"),
+        week_response = GetResponseFromAPI().getTimeSeries(self.base, self.target, week_start_date.strftime("%Y-%m-%d"),
                                                          week_end_date.strftime("%Y-%m-%d"))
 
-        year_response = GetResponseFromAPI.getTimeSeries(self.base, self.target, year_start_date.strftime("%Y-%m-%d"),
+        year_response = GetResponseFromAPI().getTimeSeries(self.base, self.target, year_start_date.strftime("%Y-%m-%d"),
                                                          year_end_date.strftime("%Y-%m-%d"))
 
         self.toLists(self.week_rates, self.week_dates, week_start_date, week_response, self.days_in_a_week)

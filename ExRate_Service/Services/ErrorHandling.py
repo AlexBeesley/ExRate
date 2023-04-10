@@ -1,2 +1,0 @@
-class NewException(Exception):
-    pass
