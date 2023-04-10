@@ -53,19 +53,35 @@ namespace ExRate_API.DataFromService
 
         private string CombineIntoJson(string output)
         {
-            var historicalData = JsonConvert.DeserializeObject<Dictionary<string, object>>(output.Substring(0, output.IndexOf("}") + 1));
-            var forecast = JsonConvert.DeserializeObject<Dictionary<string, object>>(output.Substring(output.IndexOf("}") + 1));
+            // find the index of the first occurrence of '{' in the string
+            int startIndex = output.IndexOf('{');
 
+            // if '{' is not found, return an empty dictionary
+            if (startIndex < 0)
+            {
+                return JsonConvert.SerializeObject(new Dictionary<string, Dictionary<string, object>>(), Formatting.Indented);
+            }
+
+            // extract the substring starting from the first '{'
+            string json = output.Substring(startIndex);
+
+            // deserialize the json into two dictionaries
+            var historicalData = JsonConvert.DeserializeObject<Dictionary<string, object>>(json.Substring(0, json.IndexOf("}") + 1));
+            var forecast = JsonConvert.DeserializeObject<Dictionary<string, object>>(json.Substring(json.IndexOf("}") + 1));
+
+            // combine the two dictionaries into a result dictionary
             var result = new Dictionary<string, Dictionary<string, object>>
             {
                 { "historicalData", historicalData ?? new Dictionary<string, object>() },
                 { "forecast", forecast ?? new Dictionary<string, object>() }
             };
 
-            var json = JsonConvert.SerializeObject(result, Formatting.Indented);
+            // serialize the result dictionary into json
+            string outputJson = JsonConvert.SerializeObject(result, Formatting.Indented);
 
-            return json;
+            return outputJson;
         }
+
 
         private void processSequence(Process process)
         {

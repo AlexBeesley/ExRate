@@ -1,0 +1,378 @@
+------------------------------
+Program.py
+------------------------------
+import argparse
+import os
+import numpy as np
+from pandas import read_csv
+from DataPreprocessing.ProcessDataFromResponse import ProcessDataFromResponse
+from DataPreprocessing.GenerateGraphFromData import GenerateGraphFromData
+from DataPreprocessing.DataNormaliser import DataNormaliser
+from MachineLearning.ModelManager import ModelManager
+from MachineLearning.Models.FCNN import FCNN
+from MachineLearning.Models.LSTM import LSTM
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+
+def read_currency_codes():
+    data = read_csv("Assets/currency_codes.csv")
+    return data['AlphabeticCode'].tolist()
+
+
+def get_model(model_type, input_shape):
+    if model_type.lower() == 'fcnn':
+        return FCNN(input_shape)
+    elif model_type.lower() == 'lstm':
+        return LSTM(input_shape)
+    else:
+        raise ValueError("Invalid model type. Please use 'FCNN' or 'LSTM'.")
+
+
+def process_data(base, target):
+    response_data = ProcessDataFromResponse(base=base, target=target)
+    wrates, wdates, yrates, ydates = response_data.process()
+    return wrates, wdates, yrates, ydates
+
+
+def normalise_and_prepare_data(yrates):
+    normaliser = DataNormaliser()
+    normalised_rates = normaliser.normalise(yrates)
+
+    inputs = np.array([normalised_rates[i:i + 7] for i in range(len(normalised_rates) - 7)])
+    inputs = inputs.reshape(-1, 7, 1)
+    outputs = normalised_rates[7:]
+
+    return inputs, outputs, normaliser
+
+
+def generate_forecast(model, last_input, normaliser):
+    forecast = []
+    for i in range(7):
+        prediction = model.predict(last_input.reshape(1, 7, 1), verbose=0)
+        prediction = normaliser.denormalise(prediction)
+        forecast.append(prediction[0][0])
+        last_input = np.roll(last_input, -1, axis=0)
+        last_input[-1] = prediction
+
+    return forecast
+
+
+def display_results(has_args, wrates, forecast, inputs, outputs, ydates, yrates, wdates, model, base, target):
+    if has_args:
+        historical_data = dict(zip(ydates, yrates))
+        forecast = dict(zip(wdates[-7:], forecast))
+        print(historical_data)
+        print(forecast)
+    else:
+        print("Accuracy: ", model.evaluate(inputs, outputs))
+        print(f"Actual: {wrates}")
+        print(f"Forecast: {forecast}")
+        graph = GenerateGraphFromData(yrates, ydates, base, target)
+        graph.generateGraphWithForecast(forecast)
+
+
+def main(base, target, model_type, has_args):
+    abvs = read_currency_codes()
+
+    if target in abvs and base in abvs:
+        wrates, wdates, yrates, ydates = process_data(base, target)
+        inputs, outputs, normaliser = normalise_and_prepare_data(yrates)
+        selected_model = get_model(model_type, (inputs.shape[1], inputs.shape[2]))
+        manager = ModelManager(base=base, target=target, model_type=model_type, model=selected_model.get_model())
+        model, predictions, mae = manager.predict(inputs)
+        forecast = generate_forecast(model, inputs[-1], normaliser)
+        display_results(has_args, wrates, forecast, inputs, outputs, ydates, yrates, wdates, model, base, target)
+    else:
+        raise ValueError("Invalid currency abbreviation. Please provide a correct 3-letter currency abbreviation. "
+                         "e.g. GBP, USD, EUR etc.")
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='ExRate Service')
+    parser.add_argument('-b', '--base', type=str, help='Base currency')
+    parser.add_argument('-t', '--target', type=str, help='Target currency')
+    parser.add_argument('-m', '--model', type=str, help='Model type (FCNN or LSTM)')
+    args = parser.parse_args()
+
+    if args.base and args.target and args.model:
+        main(args.base.upper(), args.target.upper(), args.model.upper(), True)
+    else:
+        print("Welcome to ExRate")
+        base = input("Please provide a base currency: ")
+        target = input("Please provide a target currency: ")
+        model_type = input("Please provide a model type (FCNN or LSTM): ")
+        main(base.upper(), target.upper(), model_type.upper(), False)
+
+
+------------------------------
+DataNormaliser.py
+------------------------------
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
+
+
+class DataNormaliser:
+    def __init__(self):
+        self.scaler = MinMaxScaler()
+
+    def normalise(self, rates):
+        rates_array = np.array(rates).reshape(-1, 1)
+        return self.scaler.fit_transform(rates_array)
+
+    def denormalise(self, rates):
+        return self.scaler.inverse_transform(rates)
+
+
+------------------------------
+GenerateGraphFromData.py
+------------------------------
+import datetime
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib import dates as mdates
+
+
+class GenerateGraphFromData:
+    def __init__(self, rates, dates, base, target):
+        self.rates = rates
+        self.dates = dates
+        self.base = base
+        self.target = target
+
+    def generateGraphWithForecast(self, forecast):
+        combined_rates = self.rates + forecast
+        combined_dates = self.dates + [datetime.date.today() + datetime.timedelta(days=i) for i in range(1, 8)]
+
+        dates = pd.to_datetime(combined_dates)
+        rates = pd.to_numeric(combined_rates)
+
+        fig, ax = plt.subplots(figsize=(12, 12))
+        ax.plot(dates, rates, label="Exchange Rates")
+
+        ax.plot(dates[-7:], rates[-7:], label="7-day Forecast", color='green')
+
+        ax.set(xlabel="Dates",
+               ylabel="Exchange Rates",
+               title=f"Exchange Rates for {self.base} to {self.target} over the past year with 7-day forecast.")
+
+        ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))
+        plt.gcf().autofmt_xdate()
+        plt.legend()
+
+        plt.show()
+
+
+------------------------------
+GetResponseFromAPI.py
+------------------------------
+import requests
+import os
+from azure.identity import DefaultAzureCredential, ClientSecretCredential
+from azure.keyvault.secrets import SecretClient
+
+
+class GetResponseFromAPI:
+    def __init__(self):
+        self.vault_url = "https://exchangerates-data.vault.azure.net/"
+        self.secret_name = "exchangerates-data"
+        self.credential = self.getCredential()
+        self.client = SecretClient(vault_url=self.vault_url, credential=self.credential)
+        self.headers = {
+            "apikey": self.client.get_secret(self.secret_name).value
+        }
+        self.payload = {}
+
+    def getCredential(self):
+        if os.environ.get("DOTNET_RUNNING_IN_CONTAINER") == "true":
+            return ClientSecretCredential(
+                tenant_id="8f962d2b-fa24-43d2-be9c-887d97b9e926",
+                client_id="11378dec-77e9-4b44-aa09-8d747940b005",
+                client_secret="LNK8Q~v6llvpvZ1bkqn6JCeUYDjO21yhPiyq5bqf"
+            )
+        else:
+            return DefaultAzureCredential()
+
+    def getTimeSeries(self, base, symbols, start_date, end_date):
+        url = "https://api.apilayer.com/exchangerates_data/timeseries?base={}&symbols={}&start_date={}&end_date={}".format(
+            base, symbols, start_date, end_date)
+        response = requests.request("GET", url, headers=self.headers, data=self.payload)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print(f"Error. Status Code: {response.status_code}")
+
+
+------------------------------
+ProcessDataFromResponse.py
+------------------------------
+import datetime
+from DataPreprocessing.GetResponseFromAPI import GetResponseFromAPI
+
+
+class ProcessDataFromResponse:
+    def __init__(self, base, target, days_in_a_year=365, days_in_a_week=7):
+        self.base = base
+        self.target = target
+        self.days_in_a_year = days_in_a_year
+        self.days_in_a_week = days_in_a_week
+        self.year_rates = []
+        self.year_dates = []
+        self.week_rates = []
+        self.week_dates = []
+
+    def toLists(self, rates, dates, start_date, response, days):
+        for i in range(days):
+            working_date = (start_date + datetime.timedelta(days=i)).strftime('%Y-%m-%d')
+            if response and 'rates' in response and working_date in response['rates']:
+                rates.append(response['rates'][working_date][self.target])
+                dates.append(working_date)
+            else:
+                print(f"Warning: Data for {working_date} not available.")
+
+    def process(self):
+        week_end_date = datetime.datetime.now()
+        week_start_date = datetime.datetime.now() - datetime.timedelta(days=self.days_in_a_week)
+
+        year_end_date = datetime.datetime.now() - datetime.timedelta(days=self.days_in_a_week)
+        year_start_date = year_end_date - datetime.timedelta(days=self.days_in_a_year)
+
+        week_response = GetResponseFromAPI().getTimeSeries(self.base, self.target, week_start_date.strftime("%Y-%m-%d"),
+                                                         week_end_date.strftime("%Y-%m-%d"))
+
+        year_response = GetResponseFromAPI().getTimeSeries(self.base, self.target, year_start_date.strftime("%Y-%m-%d"),
+                                                         year_end_date.strftime("%Y-%m-%d"))
+
+        self.toLists(self.week_rates, self.week_dates, week_start_date, week_response, self.days_in_a_week)
+        self.toLists(self.year_rates, self.year_dates, year_start_date, year_response, self.days_in_a_year)
+
+        return self.week_rates, self.week_dates, self.year_rates, self.year_dates
+
+
+------------------------------
+ModelManager.py
+------------------------------
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
+from keras.callbacks import EarlyStopping
+from sklearn.model_selection import TimeSeriesSplit
+from sklearn.metrics import mean_absolute_error
+from MachineLearning.Models.FCNN import FCNN
+from MachineLearning.Models.LSTM import LSTM
+
+
+class ModelManager:
+
+    def __init__(self, base, target, model_type, model=None, units=128, input_shape=(7, 1), epochs=100, batch_size=16):
+        self.base = base
+        self.target = target
+        self.model_type = model_type.lower()
+        self.units = units
+        self.input_shape = input_shape
+        self.epochs = epochs
+        self.batch_size = batch_size
+        self.scaler = MinMaxScaler()
+        self.model = model
+
+    def process_data(self, rates):
+        rates = np.array(rates).reshape(-1, 1)
+        rates = self.scaler.fit_transform(rates)
+        sequences = []
+        targets = []
+        for i in range(7, len(rates)):
+            sequences.append(rates[i-7:i])
+            targets.append(rates[i])
+        sequences = np.array(sequences)
+        targets = np.array(targets)
+        tscv = TimeSeriesSplit(n_splits=5)
+        for train_index, test_index in tscv.split(sequences):
+            X_train, X_test = sequences[train_index], sequences[test_index]
+            y_train, y_test = targets[train_index], targets[test_index]
+        return X_train, X_test, y_train, y_test
+
+    def create_model(self):
+        if self.model is None:
+            if self.model_type == 'fcnn':
+                self.model = FCNN(self.input_shape).get_model()
+            elif self.model_type == 'lstm':
+                self.model = LSTM(self.input_shape).get_model()
+        return self.model
+
+    def train_model(self, X_train, X_test, y_train, y_test, model):
+        history = model.fit(X_train,
+                            y_train,
+                            epochs=self.epochs,
+                            batch_size=self.batch_size,
+                            validation_data=(X_test, y_test),
+                            callbacks=[EarlyStopping(monitor='val_loss', patience=75)],
+                            verbose=0)
+        return model, history
+
+    def predict(self, rates):
+        X_train, X_test, y_train, y_test = self.process_data(rates)
+        model = self.create_model()
+        model, history = self.train_model(X_train, X_test, y_train, y_test, model)
+
+        test_predictions = model.predict(X_test)
+        mae = mean_absolute_error(self.scaler.inverse_transform(y_test),
+                                  self.scaler.inverse_transform(test_predictions))
+
+        forecast = []
+        input_sequence = rates[-1].reshape(1, 7, 1)
+        for i in range(7):
+            prediction = model.predict(input_sequence, verbose=0)
+            forecast.append(prediction[0][0])
+            input_sequence = np.roll(input_sequence, -1)
+            input_sequence[0, -1, 0] = prediction
+
+        forecast = self.scaler.inverse_transform(np.array(forecast).reshape(-1, 1))
+
+        return model, forecast, mae
+
+
+------------------------------
+FCNN.py
+------------------------------
+from keras import Sequential, regularizers
+from keras.layers import Dense, Flatten, Dropout, BatchNormalization
+
+
+class FCNN:
+    def __init__(self, input_shape):
+        self.model = Sequential()
+        self.model.add(Flatten(input_shape=input_shape))
+        self.model.add(Dense(128, activation='relu', kernel_regularizer=regularizers.l2(0.001)))
+        self.model.add(BatchNormalization())
+        self.model.add(Dropout(0.5))
+        self.model.add(Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.001)))
+        self.model.add(BatchNormalization())
+        self.model.add(Dropout(0.5))
+        self.model.add(Dense(32, activation='relu', kernel_regularizer=regularizers.l2(0.001)))
+        self.model.add(BatchNormalization())
+        self.model.add(Dense(1))
+        self.model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+
+    def get_model(self):
+        return self.model
+
+
+------------------------------
+LSTM.py
+------------------------------
+from keras import Sequential
+from keras.layers import LSTM as KerasLSTM, Dense
+
+
+class LSTM:
+    def __init__(self, input_shape):
+        self.model = Sequential()
+        self.model.add(KerasLSTM(64, activation='tanh', input_shape=input_shape, return_sequences=True))
+        self.model.add(KerasLSTM(32, activation='tanh', return_sequences=False))
+        self.model.add(Dense(32, activation='relu'))
+        self.model.add(Dense(1))
+        self.model.compile(optimizer='adam', loss='mse')
+
+    def get_model(self):
+        return self.model
+
+

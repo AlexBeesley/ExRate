@@ -16,7 +16,7 @@ namespace ExRate_API.Controllers
             _ExRateForecast = ExRateForecast;
         }
 
-        [HttpGet("forecast")]
+        [HttpGet("")]
         public IActionResult Get([FromQuery] string baseCurrency, [FromQuery] string targetCurrency, [FromQuery] string modelType)
         {
             _logger.LogInformation($"Request received for {nameof(baseCurrency)}: {baseCurrency} & {nameof(targetCurrency)}: {targetCurrency} with model: {modelType}");

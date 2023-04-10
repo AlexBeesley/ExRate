@@ -1,7 +1,6 @@
 import argparse
 import os
 import numpy as np
-import tensorflow as tf
 from pandas import read_csv
 from DataPreprocessing.ProcessDataFromResponse import ProcessDataFromResponse
 from DataPreprocessing.GenerateGraphFromData import GenerateGraphFromData
@@ -10,8 +9,7 @@ from MachineLearning.ModelManager import ModelManager
 from MachineLearning.Models.FCNN import FCNN
 from MachineLearning.Models.LSTM import LSTM
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
-
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 def read_currency_codes():
     data = read_csv("Assets/currency_codes.csv")
@@ -93,7 +91,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.base and args.target and args.model:
-        tf.get_logger().setLevel('ERROR')
         main(args.base.upper(), args.target.upper(), args.model.upper(), True)
     else:
         print("Welcome to ExRate")
