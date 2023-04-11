@@ -3,6 +3,8 @@ using ExRate_API.DataFromService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using NUnit.Framework;
+using System.Threading.Tasks;
 
 namespace ExRate_API.Tests.Controllers
 {
@@ -22,7 +24,7 @@ namespace ExRate_API.Tests.Controllers
         }
 
         [Test]
-        public async Task Get_ShouldReturnBadRequest_WhenInputParametersAreInvalid()
+        public async Task StartProcess_ShouldReturnBadRequest_WhenInputParametersAreInvalid()
         {
             // Arrange
             var baseCurrency = "";
@@ -30,14 +32,14 @@ namespace ExRate_API.Tests.Controllers
             var modelType = "";
 
             // Act
-            var result = await _controller.Get(baseCurrency, targetCurrency, modelType);
+            var result = await _controller.StartProcess(baseCurrency, targetCurrency, modelType);
 
             // Assert
             Assert.IsInstanceOf<BadRequestObjectResult>(result);
         }
 
         [Test]
-        public async Task Get_ShouldReturnOkResult_WhenInputParametersAreValid()
+        public async Task StartProcess_ShouldReturnOkResult_WhenInputParametersAreValid()
         {
             // Arrange
             var baseCurrency = "USD";
@@ -49,12 +51,17 @@ namespace ExRate_API.Tests.Controllers
                 .ReturnsAsync(expectedOutput);
 
             // Act
-            var result = await _controller.Get(baseCurrency, targetCurrency, modelType);
+            var result = await _controller.StartProcess(baseCurrency, targetCurrency, modelType);
 
             // Assert
             var okResult = result as OkObjectResult;
             Assert.IsInstanceOf<OkObjectResult>(result);
-            Assert.AreEqual(expectedOutput, okResult.Value);
+            var token = okResult.Value.GetType().GetProperty("Token").GetValue(okResult.Value, null);
+            Assert.IsNotNull(token);
+            var getResult = await _controller.GetResult(token.ToString());
+            Assert.IsInstanceOf<OkObjectResult>(getResult);
+            var getResultValue = (getResult as OkObjectResult).Value;
+            Assert.AreEqual(expectedOutput, getResultValue);
         }
     }
 }
