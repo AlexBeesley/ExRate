@@ -1,6 +1,9 @@
 ﻿using ExRate_API.Controllers;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using System.Linq.Expressions;
+using System.Text;
 
 namespace ExRate_API.DataFromService
 {
@@ -13,7 +16,7 @@ namespace ExRate_API.DataFromService
             _logger = logger;
         }
 
-        protected string RunProcess(string fileName, string scriptPath, string scriptDirectory, string targetCurrency, string baseCurrency, string modelType)
+        protected virtual async Task<string> RunProcessAsync(string fileName, string scriptPath, string scriptDirectory, string targetCurrency, string baseCurrency, string modelType)
         {
             var process = new Process
             {
@@ -30,7 +33,7 @@ namespace ExRate_API.DataFromService
                 EnableRaisingEvents = true
             };
 
-            string output = string.Empty;
+            StringBuilder outputBuilder = new StringBuilder();
             process.ErrorDataReceived += (sender, e) =>
             {
                 if (!string.IsNullOrEmpty(e.Data))
@@ -42,43 +45,58 @@ namespace ExRate_API.DataFromService
             {
                 if (!string.IsNullOrEmpty(e.Data))
                 {
-                    output += e.Data;
+                    outputBuilder.Append(e.Data);
                 }
             };
 
-            processSequence(process);
+            await ProcessSequenceAsync(process);
 
-            return CombineIntoJson(output);
+            return CombineIntoJson(outputBuilder.ToString());
         }
 
-        private string CombineIntoJson(string output)
+        protected virtual string CombineIntoJson(string output)
         {
-            int startIndex = output.IndexOf('{');
-            if (startIndex < 0)
+            int firstBracketIndex = output.IndexOf('{');
+            int secondBracketIndex = output.IndexOf('{', firstBracketIndex + 1);
+
+            if (firstBracketIndex < 0 || secondBracketIndex < 0)
             {
-                return JsonConvert.SerializeObject(new Dictionary<string, Dictionary<string, object>>(), Formatting.Indented);
+                throw new JsonReaderException("Invalid JSON provided.");
             }
 
-            string json = output.Substring(startIndex);
-            var historicalData = JsonConvert.DeserializeObject<Dictionary<string, object>>(json.Substring(0, json.IndexOf("}") + 1));
-            var forecast = JsonConvert.DeserializeObject<Dictionary<string, object>>(json.Substring(json.IndexOf("}") + 1));
-            var result = new Dictionary<string, Dictionary<string, object>>
-            {
-                { "historicalData", historicalData ?? new Dictionary<string, object>() },
-                { "forecast", forecast ?? new Dictionary<string, object>() }
-            };
+            string combinedJson = output.Substring(firstBracketIndex);
 
-            string outputJson = JsonConvert.SerializeObject(result, Formatting.Indented);
-            return outputJson;
+            JObject historicalData = JObject.Parse(combinedJson.Substring(0, secondBracketIndex - firstBracketIndex));
+            JObject forecast = JObject.Parse(combinedJson.Substring(secondBracketIndex - firstBracketIndex));
+
+            if (historicalData != null && forecast != null) {
+                var result = new Dictionary<string, object>
+                {
+                    { "historicalData", historicalData.ToObject<Dictionary<string, object>>() },
+                    { "forecast", forecast.ToObject<Dictionary<string, object>>() }
+                };
+
+                using (var writer = new StringWriter())
+                {
+                    using (var jsonWriter = new JsonTextWriter(writer))
+                    {
+                        jsonWriter.Formatting = Formatting.Indented;
+                        new JsonSerializer().Serialize(jsonWriter, result);
+                    }
+
+                    return writer.ToString();
+                }
+            }
+
+            throw new JsonReaderException("No JSON provided.");
         }
 
-
-        private void processSequence(Process process)
+        private async Task ProcessSequenceAsync(Process process)
         {
             process.Start();
             process.BeginErrorReadLine();
             process.BeginOutputReadLine();
-            process.WaitForExit();
+            await process.WaitForExitAsync();
         }
     }
 }

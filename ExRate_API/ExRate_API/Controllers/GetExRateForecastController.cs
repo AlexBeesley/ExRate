@@ -17,11 +17,17 @@ namespace ExRate_API.Controllers
         }
 
         [HttpGet("")]
-        public IActionResult Get([FromQuery] string baseCurrency, [FromQuery] string targetCurrency, [FromQuery] string modelType)
+        public async Task<IActionResult> Get([FromQuery] string baseCurrency, [FromQuery] string targetCurrency, [FromQuery] string modelType)
         {
+            if (string.IsNullOrWhiteSpace(baseCurrency) || string.IsNullOrWhiteSpace(targetCurrency) || string.IsNullOrWhiteSpace(modelType))
+            {
+                _logger.LogError("Invalid input parameters.");
+                return BadRequest("All input parameters (baseCurrency, targetCurrency, and modelType) are required.");
+            }
+
             _logger.LogInformation($"Request received for {nameof(baseCurrency)}: {baseCurrency} & {nameof(targetCurrency)}: {targetCurrency} with model: {modelType}");
 
-            var output = _ExRateForecast.GetOutput(baseCurrency, targetCurrency, modelType);
+            var output = await _ExRateForecast.GetOutputAsync(baseCurrency, targetCurrency, modelType);
 
             _logger.LogInformation($"Response sent for {nameof(baseCurrency)}: {baseCurrency} & {nameof(targetCurrency)}: {targetCurrency} with model: {modelType}");
 

@@ -2,45 +2,59 @@ using ExRate_API.Controllers;
 using ExRate_API.DataFromService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using System.Diagnostics;
-using System.Text.Json.Nodes;
 
 namespace ExRate_API.Tests.Controllers
 {
     [TestFixture]
     public class GetExRateForecastControllerTests
     {
-        private GetExRateForecastController _controller;
         private Mock<ILogger<GetExRateForecastController>> _loggerMock;
-        private Mock<GetExRateForecastBase> _getExRateForecastBaseMock;
+        private Mock<IGetExRateForecast> _exRateForecastMock;
+        private GetExRateForecastController _controller;
 
         [SetUp]
         public void Setup()
         {
-            // Arrange
             _loggerMock = new Mock<ILogger<GetExRateForecastController>>();
-            _getExRateForecastBaseMock = new Mock<GetExRateForecastBase>();
-            _controller = new GetExRateForecastController(_loggerMock.Object);
+            _exRateForecastMock = new Mock<IGetExRateForecast>();
+            _controller = new GetExRateForecastController(_loggerMock.Object, _exRateForecastMock.Object);
         }
 
         [Test]
-        public void Get_ReturnsJson()
+        public async Task Get_ShouldReturnBadRequest_WhenInputParametersAreInvalid()
         {
-            //// Arrange
-            //_getExRateForecastBaseMock.Setup(x => x.processSequence(It.IsAny<Process>()))
-            //                           .Returns("Test output");
+            // Arrange
+            var baseCurrency = "";
+            var targetCurrency = "";
+            var modelType = "";
 
-            //// Act
-            //var result = _controller.Get("USD", "EUR");
+            // Act
+            var result = await _controller.Get(baseCurrency, targetCurrency, modelType);
 
-            //// Assert
-            //Assert.IsInstanceOf<OkObjectResult>(result);
-            //var okResult = (OkObjectResult)result;
-            //Assert.IsInstanceOf<string>(okResult.Value);
-            //Assert.AreEqual("Test output", okResult.Value);
-            Assert.AreEqual(1, 1);
+            // Assert
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+        }
+
+        [Test]
+        public async Task Get_ShouldReturnOkResult_WhenInputParametersAreValid()
+        {
+            // Arrange
+            var baseCurrency = "USD";
+            var targetCurrency = "EUR";
+            var modelType = "LSTM";
+            var expectedOutput = "{\"key\": \"value\"}";
+
+            _exRateForecastMock.Setup(x => x.GetOutputAsync(baseCurrency, targetCurrency, modelType))
+                .ReturnsAsync(expectedOutput);
+
+            // Act
+            var result = await _controller.Get(baseCurrency, targetCurrency, modelType);
+
+            // Assert
+            var okResult = result as OkObjectResult;
+            Assert.IsInstanceOf<OkObjectResult>(result);
+            Assert.AreEqual(expectedOutput, okResult.Value);
         }
     }
 }

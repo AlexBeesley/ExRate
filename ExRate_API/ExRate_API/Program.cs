@@ -1,3 +1,4 @@
+using ExRate_API.Configs;
 using ExRate_API.DataFromService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +26,8 @@ else
 {
     builder.Services.AddSingleton<IGetExRateForecast, GetExRateForecastInContainer>();
 }
+
+builder.Services.Configure<LocalConfig>(builder.Configuration.GetSection("LocalConfig"));
 
 var app = builder.Build();
 
