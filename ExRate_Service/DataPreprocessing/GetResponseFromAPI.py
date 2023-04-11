@@ -8,14 +8,14 @@ class GetResponseFromAPI:
     def __init__(self):
         self.vault_url = "https://exchangerates-data.vault.azure.net/"
         self.secret_name = "exchangerates-data"
-        self.credential = self.getCredential()
+        self.credential = self.get_credential()
         self.client = SecretClient(vault_url=self.vault_url, credential=self.credential)
         self.headers = {
             "apikey": self.client.get_secret(self.secret_name).value
         }
         self.payload = {}
 
-    def getCredential(self):
+    def get_credential(self):
         if os.environ.get("DOTNET_RUNNING_IN_CONTAINER") == "true":
             return ClientSecretCredential(
                 tenant_id="8f962d2b-fa24-43d2-be9c-887d97b9e926",
@@ -25,7 +25,7 @@ class GetResponseFromAPI:
         else:
             return DefaultAzureCredential()
 
-    def getTimeSeries(self, base, symbols, start_date, end_date):
+    def get_time_series(self, base, symbols, start_date, end_date):
         url = "https://api.apilayer.com/exchangerates_data/timeseries?base={}&symbols={}&start_date={}&end_date={}".format(
             base, symbols, start_date, end_date)
         response = requests.request("GET", url, headers=self.headers, data=self.payload)

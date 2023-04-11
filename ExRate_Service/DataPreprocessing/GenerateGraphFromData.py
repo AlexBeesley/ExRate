@@ -11,7 +11,7 @@ class GenerateGraphFromData:
         self.base = base
         self.target = target
 
-    def generateGraphWithForecast(self, forecast):
+    def generate_graph_with_forecast(self, forecast):
         combined_rates = self.rates + forecast
         combined_dates = self.dates + [datetime.date.today() + datetime.timedelta(days=i) for i in range(1, 8)]
 

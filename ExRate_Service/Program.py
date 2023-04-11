@@ -11,6 +11,7 @@ from MachineLearning.Models.LSTM import LSTM
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
+
 def read_currency_codes():
     data = read_csv("Assets/currency_codes.csv")
     return data['AlphabeticCode'].tolist()
@@ -65,7 +66,7 @@ def display_results(has_args, wrates, forecast, inputs, outputs, ydates, yrates,
         print(f"Actual: {wrates}")
         print(f"Forecast: {forecast}")
         graph = GenerateGraphFromData(yrates, ydates, base, target)
-        graph.generateGraphWithForecast(forecast)
+        graph.generate_graph_with_forecast(forecast)
 
 
 def main(base, target, model_type, has_args):
@@ -82,6 +83,7 @@ def main(base, target, model_type, has_args):
     else:
         raise ValueError("Invalid currency abbreviation. Please provide a correct 3-letter currency abbreviation. "
                          "e.g. GBP, USD, EUR etc.")
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='ExRate Service')
