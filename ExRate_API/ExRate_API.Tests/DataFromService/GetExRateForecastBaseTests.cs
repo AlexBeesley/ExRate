@@ -3,6 +3,7 @@ using ExRate_API.DataFromService;
 using ExRate_API.Tests.TestHelpers;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Newtonsoft.Json.Linq;
 
 namespace ExRate_API.Tests.DataFromService
 {
@@ -34,13 +35,22 @@ namespace ExRate_API.Tests.DataFromService
         {
             // Arrange
             var validJson = "{\"date\": \"2023-01-01\"}{\"date\": \"2023-02-01\"}";
-            var expectedResult = "{\r\n  \"historicalData\": {\r\n    \"date\": \"2023-01-01\"\r\n  },\r\n  \"forecast\": {\r\n    \"date\": \"2023-02-01\"\r\n  }\r\n}";
+            var expectedResult = "{\r\n  \"forecast\": {\r\n    \"date\": \"2023-02-01\"\r\n  },\r\n  \"historicalData\": {\r\n    \"date\": \"2023-01-01\"\r\n  }\r\n}";
 
             // Act
             var result = _testHelperForGetExRateForecastBase.CallCombineIntoJson(validJson);
 
             // Assert
-            Assert.AreEqual(expectedResult, result);
+            var expectedJson = JObject.Parse(expectedResult);
+            var resultJson = JObject.Parse(result);
+
+            // Sort the key-value pairs in both JSON objects by the keys
+            var expectedJsonSorted = new JObject(expectedJson.Properties().OrderBy(p => p.Name));
+            var resultJsonSorted = new JObject(resultJson.Properties().OrderBy(p => p.Name));
+
+            Assert.AreEqual(expectedJsonSorted.ToString(), resultJsonSorted.ToString());
         }
+
+
     }
 }
