@@ -1,5 +1,6 @@
 ﻿using ExRate_API.DataFromService;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Concurrent;
 
 namespace ExRate_API.Controllers
 {
@@ -16,8 +17,8 @@ namespace ExRate_API.Controllers
             _ExRateForecast = ExRateForecast;
         }
 
-        [HttpGet("")]
-        public async Task<IActionResult> Get([FromQuery] string baseCurrency, [FromQuery] string targetCurrency, [FromQuery] string modelType)
+        [HttpPost("")]
+        public async Task<IActionResult> StartProcess([FromQuery] string baseCurrency, [FromQuery] string targetCurrency, [FromQuery] string modelType)
         {
             if (string.IsNullOrWhiteSpace(baseCurrency) || string.IsNullOrWhiteSpace(targetCurrency) || string.IsNullOrWhiteSpace(modelType))
             {
@@ -27,11 +28,55 @@ namespace ExRate_API.Controllers
 
             _logger.LogInformation($"Request received for {nameof(baseCurrency)}: {baseCurrency} & {nameof(targetCurrency)}: {targetCurrency} with model: {modelType}");
 
-            var output = await _ExRateForecast.GetOutputAsync(baseCurrency, targetCurrency, modelType);
+            var token = Guid.NewGuid().ToString();
+            var task = _ExRateForecast.GetOutputAsync(baseCurrency, targetCurrency, modelType);
+            Task.Run(() => SaveTask(token, task));
 
-            _logger.LogInformation($"Response sent for {nameof(baseCurrency)}: {baseCurrency} & {nameof(targetCurrency)}: {targetCurrency} with model: {modelType}");
+            return Ok(new { Token = token });
+        }
 
-            return Ok(output);
+        [HttpGet("{token}")]
+        public async Task<IActionResult> GetResult(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token cannot be null or empty.");
+            }
+
+            var taskExists = Tasks.TryGetValue(token, out var task);
+
+            if (!taskExists)
+            {
+                return NotFound("Task not found for token.");
+            }
+
+            if (!task.IsCompleted)
+            {
+                return NotFound("Task not yet completed.");
+            }
+
+            var result = await task;
+
+            if (result == null)
+            {
+                return NotFound("Result not found.");
+            }
+
+            return Ok(result);
+        }
+
+
+        private static readonly ConcurrentDictionary<string, Task<string>> Tasks = new ConcurrentDictionary<string, Task<string>>();
+
+        private void SaveTask(string token, Task<string> task)
+        {
+            Tasks[token] = task;
+        }
+
+        private Task<string> RetrieveTask(string token)
+        {
+            Tasks.TryRemove(token, out var task);
+            return task;
         }
     }
 }

@@ -43,8 +43,6 @@ namespace ExRate_API.Tests.DataFromService
             // Assert
             var expectedJson = JObject.Parse(expectedResult);
             var resultJson = JObject.Parse(result);
-
-            // Sort the key-value pairs in both JSON objects by the keys
             var expectedJsonSorted = new JObject(expectedJson.Properties().OrderBy(p => p.Name));
             var resultJsonSorted = new JObject(resultJson.Properties().OrderBy(p => p.Name));
 
