@@ -6,6 +6,7 @@ import { ForecastButton } from "../Components/ForecastButton";
 import { Loading } from "../Components/Loading";
 import { Error } from "../Components/Error";
 import { ChartComponent } from "../Components/ChartComponent";
+import { useLoadingMessages } from "../Hooks/UseLoadingMessages";
 
 export default function Home() {
   let root = document.documentElement;
@@ -17,7 +18,6 @@ export default function Home() {
   const [modelType, setModelType] = useState("");
   const [dropdownOptionsForCurrencies, setDropdownOptionsForCurrencies] = useState<string[]>([]);
   const [dropdownOptionsForModels, setDropdownOptionsForModels] = useState<string[]>([]);
-  const [result, setResult] = useState("");
   const [isLoading, setIsLoading] = useState("unset");
   const [data, setData] = useState<any>(null);
 
@@ -47,35 +47,35 @@ export default function Home() {
     setIsLoading("true");
     try {
       const postResponse = await fetch(
-        `https://exrate.azurewebsites.net/api/GetExRateForecast?baseCurrency=${baseCurrency}&targetCurrency=${targetCurrency}&modelType=${modelType}}`,
+        `https://exrate.azurewebsites.net/api/GetExRateForecast?baseCurrency=${baseCurrency}&targetCurrency=${targetCurrency}&modelType=${modelType}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
         }
       );
       console.log('POST response:', postResponse);
-  
+
       if (postResponse.status !== 200) {
         setIsLoading("failed");
         throw new Error("Failed to fetch forecast data");
       }
-  
+
       const postJsonData = await postResponse.json();
       const token = postJsonData.token;
       console.log('Token:', token);
-  
+
       const getResponse = await fetchWithRetry(
         `https://exrate.azurewebsites.net/api/GetExRateForecast/${token}`,
-        300000,
-        605000
+        30000,
+        600000
       );
       console.log('GET response:', getResponse);
-  
+
       if (getResponse.status !== 200) {
         setIsLoading("failed");
         throw new Error("Failed to fetch forecast data");
       }
-  
+
       const getJsonData = await getResponse.json();
       setData(getJsonData);
       setIsLoading("false");
@@ -84,12 +84,12 @@ export default function Home() {
       setIsLoading("failed");
     }
   };
-  
+
   const fetchWithRetry = async (url, interval, maxDuration) => {
     console.log('Fetching:', url);
     const maxAttempts = Math.floor(maxDuration / interval);
     let attempts = 0;
-  
+
     while (attempts < maxAttempts) {
       const response = await fetch(url);
       console.log('Retry attempt:', attempts + 1, 'Response:', response);
@@ -102,11 +102,9 @@ export default function Home() {
       attempts++;
       await new Promise((resolve) => setTimeout(resolve, interval));
     }
-  
+
     throw new Error("Failed to fetch data after 5 minutes");
   };
-  
-  
 
   const handleCurrencyChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -126,6 +124,18 @@ export default function Home() {
       }
     }
   };
+
+  const loadingMessages = [
+    "Hang tight, this can take a while",
+    "Initialising",
+    "Loading currencies data",
+    "Preprocessing data",
+    "Loading model",
+    "Building model",
+    "Training model",
+    "Predicting"
+  ];
+  const currentLoadingMessage = useLoadingMessages(loadingMessages);
 
   const baseCurrencyOptions = baseCurrency
     ? [baseCurrency, ...dropdownOptionsForCurrencies]
@@ -151,8 +161,8 @@ export default function Home() {
       <div className={Styles.title}>
         <h1>Welcome to ExRate</h1>
         <h2>
-          ExRate is a web app that allows you to get the exchange rate forecast
-          for any currency pair.
+          This is a web app that allows you to get an exchange rate forecast
+          for popular currency pairs.
         </h2>
       </div>
       <div className={Styles.container} id="container">
@@ -185,10 +195,13 @@ export default function Home() {
         {isLoading === "unset" && <></> || (
           <>
             {isLoading === "true" && (
-              <Loading
-                color={root.style.getPropertyValue("--secondary")}
-                size={120}
-              />
+              <>
+                <Loading
+                  color={root.style.getPropertyValue("--secondary")}
+                  size={120}
+                />
+                <p>{currentLoadingMessage}</p>
+              </>
             )}
             {isLoading === "false" && (
               <ChartComponent

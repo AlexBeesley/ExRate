@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '../Utilities/test-utils';
-import Footer from '../Components/footer';
+import Footer from '../Components/Footer';
 
 describe('Footer', () => {
   render(
