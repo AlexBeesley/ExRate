@@ -9,8 +9,12 @@
     }
     
     h2 {
-        margin-top: 3rem;
+        margin-top: 5rem;
         color: var(--secondary);
+    }
+
+    h3 {
+        margin-top: 3rem;
     }
     
     a {
@@ -35,6 +39,15 @@
             border: 1px solid var(--accent);;
         }
     }
+
+    .codeBlock {
+        font-family: 'Source Code Pro';
+        font-size: 1.2rem;
+        background-color: var(--code-background);
+        color: var(--code);
+        padding: 2rem;
+        border-radius: 2rem;
+      }
     
     code {
         font-family: 'Source Code Pro';

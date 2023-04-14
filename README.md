@@ -32,7 +32,7 @@ This service offers two types of models, a Fully Connected Neural Network (FCNN)
 | matplotlib    | >= 3.6.1         |
 
 
-use `pip install [Package Name]==[Required Version]` to install the required packages.
+Use `pip install [Package Name]==[Required Version]` to install the required packages.
 
 ## Usage
 First, make sure to obtain an API key for the exchange rates data from a service like apilayer. Add your API key to a `.env` file in the project's root directory:
@@ -41,7 +41,7 @@ First, make sure to obtain an API key for the exchange rates data from a service
 API_KEY=YOUR_API_KEY_HERE
 ```
 
-Run the Program.py script with the required arguments:
+Run the `Program.py` script with the required arguments:
 
 ```cmd
 python Program.py -b BASE_CURRENCY -t TARGET_CURRENCY -m MODEL_TYPE
@@ -185,7 +185,7 @@ Then to run the site locally:
 
 This should open the site in the browser by default, but you can also access it via `http://localhost:8080/`.
 
-and to build the site:
+To build the site:
 
 `yarn build`
 #
@@ -193,4 +193,3 @@ and to build the site:
 [GPL 3.0](https://choosealicense.com/licenses/gpl-3.0/)
 ### Author
 [David (Alexander) Beesley](https://github.com/AlexBeesley)
-
