@@ -13,50 +13,88 @@ While the purpose of this project is to answer the academic question, this proje
 
 # ExRate Service
 
-This service is responsible for collecting exchange rate data, this data is collected from apilayer.com and its documentation is available [here](https://apilayer.com/marketplace/exchangerates_data-api?live_demo=show). Once the Data is collected, the service will automatically train an LSTM model using TensorFlow and Keras, more information will be available on how that is handled in the CI601 report produced as part of this project.
+This service is responsible for collecting exchange rate data, this data is collected from apilayer.com and its documentation is available [here](https://apilayer.com/marketplace/exchangerates_data-api?live_demo=show).
+
+This service offers two types of models, a Fully Connected Neural Network (FCNN) and a Long Short-Term Memory (LSTM) model, for the prediction task.
 
 ## Requirments
-- Python 3.10.9 with pip
-
 
 | Package Name  | Required Version |
 |---------------|------------------|
-| numpy         | 1.23.4 < 2.0.0   |
-| pandas        | 1.5.1 < 2.0.0    |
-| requests      | 2.28.1 < 3.0.0   |
-| python-dotenv | 0.21.0 < 1.0.0   |
-| tensorflow    | 2.8.0 < 3.0.0    |
-| scikit-learn  | 1.2.0 < 2.0.0    |
-| keras         | 2.11.0 < 3.0.0   |
-| matplotlib    | 3.6.1 < 4.0.0    |
+| Python        | >= 3.10.9        |
+| numpy         | >= 1.23.4        |
+| pandas        | >= 1.5.1         |
+| requests      | >= 2.28.1        |
+| python-dotenv | >= 0.21.0        |
+| tensorflow    | >= 2.8.0         |
+| scikit-learn  | >= 1.2.0         |
+| keras         | >= 2.11.0        |
+| matplotlib    | >= 3.6.1         |
+
 
 use `pip install [Package Name]==[Required Version]` to install the required packages.
 
 ## Usage
-From the `/ExRate_Service` directory, run the script with user input from the command line use:
+First, make sure to obtain an API key for the exchange rates data from a service like apilayer. Add your API key to a `.env` file in the project's root directory:
 
-`py Program.py`
+```
+API_KEY=YOUR_API_KEY_HERE
+```
 
-and without user input, run:
+Run the Program.py script with the required arguments:
 
-`py Program.py -b [BASE_CURRENCY] -t [TARGET_CURRENCY] -m [MODEL_TYPE]`
+```cmd
+python Program.py -b BASE_CURRENCY -t TARGET_CURRENCY -m MODEL_TYPE
+```
 
-Where `BASE_CURRENCY` and `TARGET_CURRENCY` are  3-letter currency codes. `MODEL_TYPE` lets you choose between using an FCNN or LSTM model.
+- `BASE_CURRENCY`: The 3-letter code for the base currency (e.g., USD, GBP, EUR).
+- `TARGET_CURRENCY`: The 3-letter code for the target currency (e.g., USD, GBP, EUR).
+- `MODEL_TYPE`: The type of model to use for prediction. Use `FCNN` for Fully Connected Neural Network or `LSTM` for Long Short-Term Memory model.
 
-A list of acceptable currencies can be found in the `ExRate_Service/Assets/currency_codes.csv` file.
+For example:
+
+```cmd
+python Program.py -b USD -t EUR -m FCNN
+```
+
+Alternatively, you can run the `Program.py` script without arguments and provide the required information when prompted:
+
+```cmd
+python Program.py
+```
+
+```
+Welcome to ExRate
+Please provide a base currency: USD
+Please provide a target currency: EUR
+Please provide a model type (FCNN or LSTM): FCNN
+```
+The script will display the historical exchange rates data, the predicted exchange rates for the next week, and the model's accuracy. If running without command line arguments, a graph will also be displayed showing the historical data and the predicted values.
+
 # ExRate API
 This component is responsible for running the ExRate_Service Python script and returning the result as JSON. It is a .NET 6 API service which is set up to run locally or inside a Docker container.
 ## Running locally
 ### Requirments
 - .NET 6 SDK
-- ASP.NET core
 ### Setup
-To start the API server, run the following from the `/ExRate_API/ExRate_API` directory:
+First open the `appsettings.json` file, then replace the paths with the following:
 
-`dotnet run`
+```json
+  "LocalConfig": {
+    "PythonExecutablePath": "/path/to/your/python3.9",
+    "ScriptPath": "/path/to/your/ExRate/ExRate_Service/Program.py"
+  }
+```
+
+To start the API server, run the following commands from the `/ExRate_API/ExRate_API` directory:
+```
+dotnet restore
+
+dotnet run
+```
 ## Running inside a Docker container
 ### Requirments
-- Docker 20.10.21^
+- Docker 20.10.21 or higher
 ### Setup
 Before building the container, ensure you have Docker installed and Docker Desktop running.
 
@@ -66,15 +104,70 @@ From the root folder, build the container with the following command:
 
 then run the following command to start the container:
 
-`docker run -ti --rm -p 8081:80 exrate`
+`docker run -ti --rm -p PORT:80 exrate`
 
-This will run the API inside the Docker container, which can be accessed locally on port 8081. To assign the API to another port, just change the port used in the above command.
-## Usage
-Whether you are running the API in docker or locally, to make a request use the following URL schema:
+Where `PORT` is the port number you want to expose. Then the API will be accessible on `http://localhost:PORT` (e.g http://localhost:8080)
 
-`http://localhost:[PORT]/api/GetExRateForecast/[BASE_CURRENCY]&[TARGET_CURRENCY`
+## API Endpoints
+```
+POST /api/GetExRateForecast
+```
+With the following query parameters:
+- `baseCurrency` - the base currency (e.g. `USD`)
+- `targetCurrency` - the target currency (e.g. `GBP`)
+- `modelType` - the model type (e.g. `LSTM`)
 
-Where `PORT` is the port being used; `BASE_CURRENCY` and `TARGET_CURRENCY` are 3-letter currency codes. For example: `http://localhost:8080/api/GetExRateForecast/USD&EUR`
+Putting this together would result in:
+
+```
+POST /api/GetExRateForecast?ites.net/api/GetExRateForecast?baseCurrency=USD&targetCurrency=GBP&modelType=LSTM
+```
+
+This request will return a JSON response containing a process token, such as:
+
+```json
+{
+    "token": GUID
+}
+```
+
+Take this `GUID` (which will look something like c76b2ddd-f5c7-4e09-b147-5ec8f4137429) and apply it to the following request to get the forecast once the model has been built:
+
+```
+GET /api/GetExRateForecast/GUID
+```
+
+This will return `404 Not Found` until the forecast has been processed - which usually takes between 2 and 5 minutes to complete.
+
+Once the forecast has been processed, it will be returned as a json with `200 OK`. Here is an example of how this response looks:
+
+```json
+{
+  "historicalData": {
+    "2022-04-06": 0.765115,
+    "2022-04-07": 0.76518,
+    "2022-04-08": 0.767142,
+    "2022-04-09": 0.768149,
+	. . .
+    "2023-04-02": 0.813715,
+    "2023-04-03": 0.80499,
+    "2023-04-04": 0.80015,
+    "2023-04-05": 0.8024
+  },
+  "forecast": {
+    "2023-04-06": 0.8083399,
+    "2023-04-07": 0.8152494,
+    "2023-04-08": 0.8184916,
+    "2023-04-09": 0.8095991,
+    "2023-04-10": 0.8039013,
+    "2023-04-11": 0.8244032,
+    "2023-04-12": 0.86308336
+  }
+}
+```
+
+`historicalData` containes the exchange rates of the selected currencies for the past year and `forecast` contains the the 7-day forecast.
+
 # ExRate Frontend
 This is a Single-Page App built using the popular JavaScript framework, React. Its aim is to demonstrate how the ExRate API can be used.
 ## Requirements
