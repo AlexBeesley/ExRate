@@ -123,7 +123,7 @@ Putting this together would result in:
 POST /api/GetExRateForecast?ites.net/api/GetExRateForecast?baseCurrency=USD&targetCurrency=GBP&modelType=LSTM
 ```
 
-This request will return a JSON response containing a process token, such as:
+This request will return a JSON response containing a process token, in this format:
 
 ```json
 {
@@ -131,12 +131,13 @@ This request will return a JSON response containing a process token, such as:
 }
 ```
 
-Take this `GUID` (which will look something like c76b2ddd-f5c7-4e09-b147-5ec8f4137429) and apply it to the following request to get the forecast once the model has been built:
+Note that each `POST` request will return its own guid and start a separate process. 
+
+Take this `GUID` (which will look something like `c76b2ddd-f5c7-4e09-b147-5ec8f4137429`) and apply it to the following request to get the forecast once the model has been built, for example:
 
 ```
-GET /api/GetExRateForecast/GUID
+GET /api/GetExRateForecast/c76b2ddd-f5c7-4e09-b147-5ec8f4137429
 ```
-
 This will return `404 Not Found` until the forecast has been processed - which usually takes between 2 and 5 minutes to complete.
 
 Once the forecast has been processed, it will be returned as a json with `200 OK`. Here is an example of how this response looks:
