@@ -1,76 +1,68 @@
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
 from keras.callbacks import EarlyStopping
-from sklearn.model_selection import TimeSeriesSplit
-from sklearn.metrics import mean_absolute_error
+from keras.losses import mean_absolute_error
+
+from DataPreprocessing.DataNormaliser import DataNormaliser
 from MachineLearning.Models.FCNN import FCNN
 from MachineLearning.Models.LSTM import LSTM
 
 
 class ModelManager:
-
-    def __init__(self, base, target, model_type, model=None, units=128, input_shape=(7, 1), epochs=100, batch_size=16):
+    def __init__(self, verbosity, model_type, year_rates, year_dates, base, target):
+        self.verbosity = verbosity
+        self.model_type = model_type
+        self.year_rates = year_rates
+        self.year_dates = year_dates
         self.base = base
         self.target = target
-        self.model_type = model_type.lower()
-        self.units = units
-        self.input_shape = input_shape
-        self.epochs = epochs
-        self.batch_size = batch_size
-        self.scaler = MinMaxScaler()
-        self.model = model
+        self.input_shape = (1, 1)
+        self.normaliser = DataNormaliser()
 
-    def process_data(self, rates):
-        rates = np.array(rates).reshape(-1, 1)
-        rates = self.scaler.fit_transform(rates)
-        sequences = []
-        targets = []
-        for i in range(7, len(rates)):
-            sequences.append(rates[i-7:i])
-            targets.append(rates[i])
-        sequences = np.array(sequences)
-        targets = np.array(targets)
-        tscv = TimeSeriesSplit(n_splits=5)
-        for train_index, test_index in tscv.split(sequences):
-            X_train, X_test = sequences[train_index], sequences[test_index]
-            y_train, y_test = targets[train_index], targets[test_index]
-        return X_train, X_test, y_train, y_test
+    def select_model(self):
+        if self.model_type == "FCNN":
+            return FCNN(self.input_shape).get_model()
+        elif self.model_type == "LSTM":
+            return LSTM(self.input_shape).get_model()
+        else:
+            raise ValueError("Invalid model type. Choose either 'FCNN' or 'LSTM'.")
 
-    def create_model(self):
-        if self.model is None:
-            if self.model_type == 'fcnn':
-                self.model = FCNN(self.input_shape).get_model()
-            elif self.model_type == 'lstm':
-                self.model = LSTM(self.input_shape).get_model()
-        return self.model
+    def prepare_data(self):
+        normalised_year_rates = self.normaliser.normalise(self.year_rates)
+        x_train = []
+        y_train = []
+        for i in range(len(normalised_year_rates) - 1):
+            x_train.append(normalised_year_rates[i:i + 1])
+            y_train.append(normalised_year_rates[i + 1])
+        x_train, y_train = np.array(x_train), np.array(y_train)
+        return x_train, y_train
 
-    def train_model(self, X_train, X_test, y_train, y_test, model):
-        history = model.fit(X_train,
-                            y_train,
-                            epochs=self.epochs,
-                            batch_size=self.batch_size,
-                            validation_data=(X_test, y_test),
-                            callbacks=[EarlyStopping(monitor='val_loss', patience=75)],
-                            verbose=0)
-        return model, history
+    def train_model(self, model, x_train, y_train):
+        early_stopping = EarlyStopping(monitor='val_loss', patience=20,
+                                       restore_best_weights=True, verbose=self.verbosity)
+        model.compile(loss=mean_absolute_error, optimizer='adam', metrics=['mae'])
+        history = model.fit(x_train, y_train, epochs=200, batch_size=32, validation_split=0.1,
+                            callbacks=[early_stopping], shuffle=False, verbose=self.verbosity)
+        return history
 
-    def predict(self, rates):
-        X_train, X_test, y_train, y_test = self.process_data(rates)
-        model = self.create_model()
-        model, history = self.train_model(X_train, X_test, y_train, y_test, model)
+    def forecast(self, model, x_train):
+        predictions = []
+        last_known = x_train[-1]
+        for _ in range(7):
+            prediction = model.predict(np.array([last_known]), verbose=self.verbosity)
+            predictions.append(prediction[0][0])
+            last_known = np.vstack((last_known[1:], prediction))
+        predictions = np.array(predictions).reshape(-1, 1)
+        return self.normaliser.denormalise(predictions).flatten().tolist()
 
-        test_predictions = model.predict(X_test)
-        mae = mean_absolute_error(self.scaler.inverse_transform(y_test),
-                                  self.scaler.inverse_transform(test_predictions))
+    def evaluate(self, y_true, y_pred):
+        y_true = np.array(y_true)
+        y_pred = np.array(y_pred)
+        return mean_absolute_error(y_true, y_pred)
 
-        forecast = []
-        input_sequence = rates[-1].reshape(1, 7, 1)
-        for i in range(7):
-            prediction = model.predict(input_sequence, verbose=0)
-            forecast.append(prediction[0][0])
-            input_sequence = np.roll(input_sequence, -1)
-            input_sequence[0, -1, 0] = prediction
-
-        forecast = self.scaler.inverse_transform(np.array(forecast).reshape(-1, 1))
-
-        return model, forecast, mae
+    def run(self):
+        model = self.select_model()
+        x_train, y_train = self.prepare_data()
+        history = self.train_model(model, x_train, y_train)
+        forecast = self.forecast(model, x_train)
+        mae = self.evaluate(self.year_rates[-7:], forecast)
+        return forecast, history, mae

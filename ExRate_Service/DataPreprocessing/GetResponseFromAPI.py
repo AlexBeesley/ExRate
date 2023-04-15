@@ -15,7 +15,5 @@ class GetResponseFromAPI:
         url = "https://api.apilayer.com/exchangerates_data/timeseries?base={}&symbols={}&start_date={}&end_date={}".format(
             base, symbols, start_date, end_date)
         response = requests.request("GET", url, headers=self.headers, data=self.payload)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            print(f"Error. Status Code: {response.status_code}")
+        response.raise_for_status()
+        return response.json()
