@@ -1,8 +1,8 @@
 import React from "react";
 import Styles from "../Styles/home.module.scss";
 import { useState, useEffect } from "react";
-import { CurrencyDropdown } from "../Components/currencyDropdown";
-import { ForecastButton } from "../Components/forecastButton";
+import { CurrencyDropdown } from "../Components/currencydropdown";
+import { ForecastButton } from "../Components/forecastbutton";
 import { Loading } from "../Components/loading";
 import { Error } from "../Components/error";
 import { ChartComponent } from "../Components/chartComponent";
