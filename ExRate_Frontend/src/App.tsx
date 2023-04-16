@@ -6,7 +6,7 @@ import Home from "./Pages/Home";
 import About from "./Pages/About";
 import Error from "./Pages/Error";
 import Nav from "./Components/nav";
-import DarkModeToggle from "./Components/darkmodetoggle";
+import DarkModeToggle from "./Components/DarkModeToggle";
 import Footer from "./Components/footer";
 import icon from "./Images/icon.png";
 import Loader from "react-spinners/PropagateLoader";
