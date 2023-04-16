@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { CurrencyDropdown } from "../Components/currencydropdown";
 import { ForecastButton } from "../Components/forecastbutton";
 import { Loading } from "../Components/loading";
-import { Error } from "../Components/error";
-import { ChartComponent } from "../Components/chartComponent";
-import { useLoadingMessages } from "../Hooks/useLoadingMessages";
+import { ErrorBox } from "../Components/errorbox";
+import { ChartComponent } from "../Components/chartcomponent";
+import { useLoadingMessages } from "../Hooks/useloadingmessages";
 
 export default function Home() {
   let root = document.documentElement;
@@ -210,7 +210,7 @@ export default function Home() {
                 data={data}
               />
             )}
-            {isLoading === "failed" && <Error />}
+            {isLoading === "failed" && <ErrorBox />}
           </>
         )}
       </div>

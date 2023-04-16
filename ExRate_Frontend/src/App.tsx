@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import Home from "./Pages/Home";
 import About from "./Pages/About";
-import Error from "./Pages/ErrorPage";
+import Error from "./Pages/Error";
 import Nav from "./Components/nav";
 import DarkModeToggle from "./Components/darkmodetoggle";
 import Footer from "./Components/footer";

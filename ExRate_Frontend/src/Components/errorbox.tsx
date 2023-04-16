@@ -1,7 +1,7 @@
 import React from "react";
 import Styles from "../Styles/home.module.scss";
 
-export const Error: React.FC = () => {
+export const ErrorBox: React.FC = () => {
   return (
     <div className={Styles.error}>
       <h3>Oops! Something went wrong.</h3>
