@@ -5,9 +5,9 @@ import { Helmet } from "react-helmet";
 import Home from "./Pages/Home";
 import About from "./Pages/About";
 import Error from "./Pages/Error";
-import Nav from "./Components/nav";
+import Nav from "./Components/Nav";
 import DarkModeToggle from "./Components/DarkModeToggle";
-import Footer from "./Components/footer";
+import Footer from "./Components/Footer";
 import icon from "./Images/icon.png";
 import Loader from "react-spinners/PropagateLoader";
 
