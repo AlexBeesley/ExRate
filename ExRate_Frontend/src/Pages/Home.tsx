@@ -135,7 +135,7 @@ export default function Home() {
     "Training model",
     "Predicting"
   ];
-  const currentLoadingMessage = useLoadingMessages(loadingMessages);
+  const currentLoadingMessage = UseLoadingMessages(loadingMessages);
 
   const baseCurrencyOptions = baseCurrency
     ? [baseCurrency, ...dropdownOptionsForCurrencies]
