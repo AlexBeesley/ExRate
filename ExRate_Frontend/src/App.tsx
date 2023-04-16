@@ -1,5 +1,5 @@
 import Styles from "./Styles/main.module.scss";
-import { BrowserRouter as Routes, Route, BrowserRouter } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, BrowserRouter } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import Home from "./Pages/Home";

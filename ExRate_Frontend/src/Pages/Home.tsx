@@ -1,12 +1,12 @@
 import React from "react";
 import Styles from "../Styles/home.module.scss";
 import { useState, useEffect } from "react";
-import { CurrencyDropdown } from "../Components/currencydropdown";
-import { ForecastButton } from "../Components/forecastbutton";
-import { Loading } from "../Components/loading";
-import { ErrorBox } from "../Components/errorbox";
-import { ChartComponent } from "../Components/chartcomponent";
-import { useLoadingMessages } from "../Hooks/useloadingmessages";
+import CurrencyDropdown from "../Components/currencydropdown";
+import ForecastButton from "../Components/forecastbutton";
+import Loading from "../Components/loading";
+import ErrorBox from "../Components/errorbox";
+import ChartComponent from "../Components/chartcomponent";
+import useLoadingMessages from "../Hooks/useloadingmessages";
 
 export default function Home() {
   let root = document.documentElement;

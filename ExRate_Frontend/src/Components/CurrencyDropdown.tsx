@@ -7,12 +7,7 @@ interface CurrencyDropdownProps {
   onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
-export const CurrencyDropdown: React.FC<CurrencyDropdownProps> = ({
-  id,
-  value,
-  options,
-  onChange,
-}) => {
+export default function CurrencyDropdown({ id, value, options, onChange }: CurrencyDropdownProps): JSX.Element {
   return (
     <select id={id} value={value} onChange={onChange}>
       {options.map((currency) => (
@@ -22,4 +17,4 @@ export const CurrencyDropdown: React.FC<CurrencyDropdownProps> = ({
       ))}
     </select>
   );
-};
+}

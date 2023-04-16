@@ -6,13 +6,10 @@ interface ForecastButtonProps {
   onClick: () => void;
 }
 
-export const ForecastButton: React.FC<ForecastButtonProps> = ({
-  disabled,
-  onClick,
-}) => {
+export default function ForecastButton({ disabled, onClick }: ForecastButtonProps): JSX.Element {
   return (
     <button className={Styles.button} onClick={onClick} disabled={disabled}>
       Get forecast
     </button>
   );
-};
+}

@@ -9,7 +9,7 @@ interface GraphProps {
   };
 }
 
-const Graph: FC<GraphProps> = ({ data }) => {
+export default function Graph({ data }: GraphProps): JSX.Element {
   const dates = Object.keys(data);
   const firstKeyValues = dates.map((date) => data[date]['key1']);
   const secondKeyValues = dates.map((date) => data[date]['key2']);
@@ -33,7 +33,4 @@ const Graph: FC<GraphProps> = ({ data }) => {
   };
 
   return <Line data={chartData} />;
-};
-
-export default Graph;
-
+}

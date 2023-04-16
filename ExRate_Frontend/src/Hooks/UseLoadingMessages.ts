@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
 
-export const useLoadingMessages = (
-  messages: string[],
-  interval: number = 34285
-) => {
+export default function useLoadingMessages(messages: string[], interval: number = 34285): string {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
@@ -17,4 +14,4 @@ export const useLoadingMessages = (
   }, [interval, messages.length]);
 
   return messages[currentIndex];
-};
+}
