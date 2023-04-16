@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip install numpy pandas requests python-dotenv tensorflow scikit-learn keras matplotlib azure-core azure-common azure-identity azure-keyvault-secrets
+RUN pip install numpy pandas requests python-dotenv tensorflow scikit-learn keras matplotlib seaborn
 
 COPY ./ExRate_Service ExRate_Service
 COPY --from=package /app/out ExRate_API
