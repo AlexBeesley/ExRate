@@ -225,7 +225,7 @@ export default function About() {
         </ul>
         <h3>Usage</h3>
         <p>From the <code>/ExRate_Frontend</code> directory, you can load dependencies
-          simplicity with:</p>
+          simply with:</p>
         <p><code>yarn</code></p>
         <p>Then to run the site locally:</p>
         <p><code>yarn start</code></p>

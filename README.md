@@ -175,7 +175,7 @@ This is a Single-Page App built using the popular JavaScript framework, React. I
 - node.js 16.7.1^
 - yarn 1.22.19^
 ## Usage
-From the `/ExRate_Frontend` directory, you can load dependencies simplicity with:
+From the `/ExRate_Frontend` directory, you can load dependencies simply with:
 
 `yarn`
 

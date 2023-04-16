@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { render } from '../Utilities/test-utils';
-import DarkModeToggle from '../Components/Darkmodetoggle';
+import DarkModeToggle from '../Components/darkModeToggle';
 
 describe('DarkModeToggle', () => {
   it('DarkModeToggle is rendered', () => {

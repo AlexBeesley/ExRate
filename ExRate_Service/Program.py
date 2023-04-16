@@ -1,5 +1,7 @@
 import argparse
 import os
+import random
+
 from pandas import read_csv
 from DataPreprocessing.GenerateGraphFromData import GenerateGraphsFromData
 from DataPreprocessing.ProcessDataFromResponse import ProcessDataFromResponse
