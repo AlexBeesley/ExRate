@@ -1,7 +1,7 @@
 import React from "react";
 import Styles from "../Styles/home.module.scss";
 
-export default function ErrorBox(): JSX.Element {
+export default function ErrorBox() {
   return (
     <div className={Styles.error}>
       <h3>Oops! Something went wrong.</h3>

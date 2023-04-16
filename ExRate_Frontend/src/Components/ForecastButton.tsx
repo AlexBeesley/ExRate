@@ -6,7 +6,7 @@ interface ForecastButtonProps {
   onClick: () => void;
 }
 
-export default function ForecastButton({ disabled, onClick }: ForecastButtonProps): JSX.Element {
+export default function ForecastButton({ disabled, onClick }: ForecastButtonProps) {
   return (
     <button className={Styles.button} onClick={onClick} disabled={disabled}>
       Get forecast

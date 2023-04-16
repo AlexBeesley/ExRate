@@ -9,7 +9,7 @@ interface GraphProps {
   };
 }
 
-export default function Graph({ data }: GraphProps): JSX.Element {
+export default function Graph({ data }: GraphProps) {
   const dates = Object.keys(data);
   const firstKeyValues = dates.map((date) => data[date]['key1']);
   const secondKeyValues = dates.map((date) => data[date]['key2']);

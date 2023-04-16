@@ -7,7 +7,7 @@ interface CurrencyDropdownProps {
   onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
-export default function CurrencyDropdown({ id, value, options, onChange }: CurrencyDropdownProps): JSX.Element {
+export default function CurrencyDropdown({ id, value, options, onChange }: CurrencyDropdownProps) {
   return (
     <select id={id} value={value} onChange={onChange}>
       {options.map((currency) => (

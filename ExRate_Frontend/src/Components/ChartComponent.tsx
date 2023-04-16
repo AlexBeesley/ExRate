@@ -8,7 +8,7 @@ interface ChartComponentProps {
   data: any;
 }
 
-export default function ChartComponent({ baseCurrency, targetCurrency, data }: ChartComponentProps): JSX.Element {
+export default function ChartComponent({ baseCurrency, targetCurrency, data }: ChartComponentProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
