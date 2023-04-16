@@ -1,5 +1,5 @@
 import Styles from "./Styles/main.module.scss";
-import { BrowserRouter as Router, Routes, Route, BrowserRouter } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import Home from "./Pages/Home";
@@ -23,7 +23,7 @@ export const App = () => {
   }, [])
 
   return (
-    <BrowserRouter>
+    <Router>
       <Helmet>
         <link rel="icon" href={icon} />
       </Helmet>
@@ -44,6 +44,6 @@ export const App = () => {
             <Footer />
           </div>
         </div>)}
-    </BrowserRouter>
+    </Router>
   )
 }

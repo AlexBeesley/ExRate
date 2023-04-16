@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
-import Chart from "chart.js/auto";
 import Styles from "../Styles/home.module.scss";
+import Chart from "chart.js/auto";
 
 interface ChartComponentProps {
   baseCurrency: string;

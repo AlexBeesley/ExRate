@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export default function useLoadingMessages(messages: string[], interval: number = 34285): string {
+export default function UseLoadingMessages(messages: string[], interval: number = 34285): string {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
