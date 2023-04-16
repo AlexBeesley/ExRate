@@ -6,7 +6,7 @@ import ForecastButton from "../Components/ForecastButton";
 import Loading from "../Components/Loading";
 import ErrorBox from "../Components/ErrorBox";
 import ChartComponent from "../Components/ChartComponent";
-import UseLoadingMessages from "../Hooks/Useloadingmessages";
+import UseLoadingMessages from "../Hooks/UseLoadingMessages";
 
 export default function Home() {
   let root = document.documentElement;
