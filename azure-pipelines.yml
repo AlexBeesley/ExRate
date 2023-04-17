@@ -12,13 +12,6 @@ variables:
   tag: '$(Build.BuildId)'
 
   vmImage: 'ubuntu-latest'
-  
-  subscriptionId: '7c7724e4-7059-4a11-a3fc-131ccce5a62b'
-  servicePrincipalId: 'e852e09e-4018-4a6e-a53a-a65d3e57feaf'
-  servicePrincipalKey: 'ruW8Q~dXoASVIYIU5~mL7ILuOZVShUINtVsOKdsk'
-  tenantId: '8f962d2b-fa24-43d2-be9c-887d97b9e926'
-  webAppName: 'exrate'
-  resourceGroupName: 'ExRate'
 
 stages:
 - stage: Test_Stage
@@ -34,8 +27,8 @@ stages:
       inputs:
         command: 'test'
         projects: '**/*Tests.csproj'
-- stage: Build_Docker_Image_Then_Deploy
-  displayName: Build Docker Image Then Deploy
+- stage: Build_Docker_Image_Stage
+  displayName: Docker build and push stage
   jobs:
   - job: Docker_Build
     displayName: Docker build and push
@@ -51,25 +44,3 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
-    - task: AzureWebAppContainer@1
-      displayName: Deploy to Web App
-      inputs:
-        azureSubscription: $(subscriptionId)
-        appName: $(webAppName)
-        resourceGroupName: $(resourceGroupName)
-        images: |
-          $(containerRegistry)/$(imageRepository):$(tag)
-        multiContainerConfigFile: |
-          {
-            "dockerComposeFileUrl": "",
-            "dockerComposeFile": "",
-            "orchestratorType": ""
-          }
-        containerRegistryType: 'Azure Container Registry'
-        credentialsSource: 'ServicePrincipal'
-        containerRegistry: $(dockerRegistryServiceConnection)
-        azureContainerRegistry: $(containerRegistry)
-        azureSubscriptionEndpoint: $(servicePrincipalId)
-        azureResourceGroup: $(resourceGroupName)
-        azureTenantId: $(tenantId)
-        azureContainerRegistryPassword: $(servicePrincipalKey)
