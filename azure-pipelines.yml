@@ -5,14 +5,12 @@ resources:
 - repo: self
 
 variables:
-  # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: '5d05a2ef-c74a-47da-898a-9520334170cb'
   imageRepository: 'exrate'
   containerRegistry: 'exrate.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
 
-  # Agent VM image names
   vmImage: 'ubuntu-latest'
 
 stages:
@@ -46,4 +44,3 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
-
