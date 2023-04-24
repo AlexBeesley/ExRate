@@ -91,15 +91,15 @@
         padding-top: 8rem;
     }
 
-    .chartContainer {
+    .chart {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        width: 90%;
-        max-width: 80rem;
-        background: #00000020;
+        max-height: 35rem;
+        background: #00000030;
         border: 0.2rem solid var(--primary);
+        padding: 1rem;
         border-radius: 0.5rem;
     }
 

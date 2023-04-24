@@ -1,10 +1,13 @@
+import os
 import requests
+from dotenv import load_dotenv
 
 
 class GetResponseFromAPI:
     def __init__(self):
+        load_dotenv()
         self.headers = {
-            "apikey": "Sz8URYmcwtZwCogxzXPoFqXE0TCALKad"
+            "apikey": os.getenv("API_KEY")
         }
         self.payload = {}
 

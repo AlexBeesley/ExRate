@@ -38,31 +38,38 @@ namespace ExRate_API.Controllers
         [HttpGet("{token}")]
         public async Task<IActionResult> GetResult(string token)
         {
-            if (string.IsNullOrEmpty(token))
+            try
             {
-                return BadRequest("Token cannot be null or empty.");
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token cannot be null or empty.");
+                }
+
+                var taskExists = Tasks.TryGetValue(token, out var task);
+
+                if (!taskExists)
+                {
+                    return NotFound("Task not found for token.");
+                }
+
+                if (!task.IsCompleted)
+                {
+                    return NotFound("Task not yet completed.");
+                }
+
+                var result = await task;
+
+                if (result == null)
+                {
+                    return NotFound("Result not found.");
+                }
+
+                return Ok(result);
             }
-
-            var taskExists = Tasks.TryGetValue(token, out var task);
-
-            if (!taskExists)
+            catch (Exception ex) 
             {
-                return NotFound("Task not found for token.");
+                return StatusCode(503, $"Data from API not available. Please try again later. \nError: {ex}");
             }
-
-            if (!task.IsCompleted)
-            {
-                return NotFound("Task not yet completed.");
-            }
-
-            var result = await task;
-
-            if (result == null)
-            {
-                return NotFound("Result not found.");
-            }
-
-            return Ok(result);
         }
 
 

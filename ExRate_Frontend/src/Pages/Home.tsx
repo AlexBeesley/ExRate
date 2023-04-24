@@ -19,6 +19,7 @@ export default function Home() {
   const [dropdownOptionsForCurrencies, setDropdownOptionsForCurrencies] = useState<string[]>([]);
   const [dropdownOptionsForModels, setDropdownOptionsForModels] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState("unset");
+  const [errorMessage, setErrorMessage] = useState("");
   const [data, setData] = useState<any>(null);
 
   useEffect(() => {
@@ -66,14 +67,17 @@ export default function Home() {
 
       const getResponse = await fetchWithRetry(
         `https://exrate.azurewebsites.net/api/GetExRateForecast/${token}`,
-        30000,
-        600000
+        10000,
+        400000
       );
       console.log('GET response:', getResponse);
 
       if (getResponse.status !== 200) {
         setIsLoading("failed");
-        throw new Error("Failed to fetch forecast data");
+        if(getResponse.status === 503) {
+          setErrorMessage("503 - Service unavailable");
+        }
+        setErrorMessage("An unexpected error occurred");
       }
 
       const getJsonData = await getResponse.json();
@@ -95,15 +99,17 @@ export default function Home() {
       console.log('Retry attempt:', attempts + 1, 'Response:', response);
       if (response.status !== 404) {
         if (response.status !== 200) {
-          throw new Error("Failed to fetch data");
+          if (response.status === 503) {
+            throw new Error(errorMessage);
+          }
+          throw new Error(errorMessage);
         }
         return response;
       }
       attempts++;
       await new Promise((resolve) => setTimeout(resolve, interval));
     }
-
-    throw new Error("Failed to fetch data after 5 minutes");
+    throw new Error(errorMessage);
   };
 
   const handleCurrencyChange = (
@@ -210,7 +216,7 @@ export default function Home() {
                 data={data}
               />
             )}
-            {isLoading === "failed" && <ErrorBox />}
+            {isLoading === "failed" && <ErrorBox errorMessage={errorMessage}/>}
           </>
         )}
       </div>
