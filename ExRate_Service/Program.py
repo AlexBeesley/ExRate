@@ -31,38 +31,36 @@ def display_results(has_args, year_dates, year_rates, week_dates, week_rates, mo
                                         target=target,
                                         history=history,
                                         forecast=forecast,
-                                        dates=year_dates)
+                                        dates=year_dates,)
         graphs.display_evaluation_graphs()
 
 
 def main(base, target, model_type, has_args):
-    abvs = read_currency_codes()
     verbosity = 1
     if has_args:
         verbosity = 0
-    if target in abvs and base in abvs:
-        processData = ProcessDataFromResponse(base=base, target=target)
-        week_rates, week_dates, year_rates, year_dates = processData.process()
-        modelManager = ModelManager(verbosity, model_type, year_rates, year_dates, base, target)
-        forecast, history, mae = modelManager.run()
-        display_results(has_args, year_dates, year_rates, week_dates, week_rates,
-                        model_type, history, forecast, base, target)
-    else:
-        raise ValueError("Invalid currency abbreviation. Please provide a correct 3-letter currency abbreviation. "
-                         "e.g. GBP, USD, EUR etc.")
+    processData = ProcessDataFromResponse(base=base, target=target)
+    week_rates, week_dates, year_rates, year_dates = processData.process()
+    lookback = 7
+    modelManager = ModelManager(verbosity, model_type, year_rates, year_dates, base, target, lookback)
+    forecast, history, mae = modelManager.run()
+    display_results(has_args, year_dates, year_rates, week_dates, week_rates,
+                    model_type, history, forecast, base, target)
 
 
-def process_args(args, has_args=False):
+def process_args(args, has_args):
+    abvs = read_currency_codes()
     if has_args:
         base, target, model_type = args.base.upper(), args.target.upper(), args.model.upper()
     else:
         base = input("Please provide a base currency: ").upper()
         target = input("Please provide a target currency: ").upper()
         model_type = input("Please provide a model type (FCNN or LSTM): ").upper()
-
     if model_type not in ['FCNN', 'LSTM']:
         raise ValueError("Invalid model type. Please use 'FCNN' or 'LSTM'.")
-
+    if target not in abvs and base not in abvs:
+        raise ValueError("Invalid currency abbreviation. Please provide a correct 3-letter currency abbreviation. "
+                         "e.g. GBP, USD, EUR etc.")
     main(base, target, model_type, has_args)
 
 

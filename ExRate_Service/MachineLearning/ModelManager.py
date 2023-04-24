@@ -8,14 +8,15 @@ from MachineLearning.Models.LSTM import LSTM
 
 
 class ModelManager:
-    def __init__(self, verbosity, model_type, year_rates, year_dates, base, target):
+    def __init__(self, verbosity, model_type, year_rates, year_dates, base, target, lookback):
+        self.lookback = lookback
         self.verbosity = verbosity
         self.model_type = model_type
         self.year_rates = year_rates
         self.year_dates = year_dates
         self.base = base
         self.target = target
-        self.input_shape = (1, 1)
+        self.input_shape = (lookback, 1)
         self.normaliser = DataNormaliser()
 
     def select_model(self):
@@ -30,11 +31,12 @@ class ModelManager:
         normalised_year_rates = self.normaliser.normalise(self.year_rates)
         x_train = []
         y_train = []
-        for i in range(len(normalised_year_rates) - 1):
-            x_train.append(normalised_year_rates[i:i + 1])
-            y_train.append(normalised_year_rates[i + 1])
+        for i in range(len(normalised_year_rates) - self.lookback):
+            x_train.append(normalised_year_rates[i:i + self.lookback])
+            y_train.append(normalised_year_rates[i + self.lookback])
         x_train, y_train = np.array(x_train), np.array(y_train)
         return x_train, y_train
+
 
     def train_model(self, model, x_train, y_train):
         early_stopping = EarlyStopping(monitor='val_loss', patience=20,

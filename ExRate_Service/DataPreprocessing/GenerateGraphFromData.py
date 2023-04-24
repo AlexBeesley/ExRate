@@ -37,21 +37,25 @@ class GenerateGraphsFromData:
         plt.legend()
         plt.show()
 
-        combined_rates = self.yrates[-30:] + self.forecast
-        combined_dates = self.dates[-30:] + [datetime.date.today() + datetime.timedelta(days=i) for i in range(1, 8)]
-        rates = pd.to_numeric(combined_rates)
-        dates = pd.to_datetime(combined_dates)
+        historical_rates = self.yrates[-60:]
+        historical_dates = self.dates[-60:]
+        actual_rates = pd.to_numeric(self.wrates[:7])
+        forecast_dates = [datetime.date.today() + datetime.timedelta(days=i) for i in range(1, 8)]
+        forecast_rates = pd.to_numeric(self.forecast)
+        forecast_dates = pd.to_datetime(forecast_dates)
+        dates = [datetime.datetime.strptime(d, '%Y-%m-%d').date() for d in historical_dates]
 
         plt.figure(figsize=(12, 6))
-        plt.plot(dates, rates, label='Exchange Rates')
-        plt.plot([dates[-1], dates[-1] + datetime.timedelta(days=7)], [rates[-1], self.forecast[0]],
-                 label='Forecast', color='green')
-        plt.plot([dates[-1], dates[-1] + datetime.timedelta(days=7)], [rates[-1], self.wrates[0]],
-                 label='Actual', color='red')
+        plt.plot(dates, historical_rates, label='Historical Exchange Rates')
+        last_date = dates[-1]
+        actual_dates = [last_date + datetime.timedelta(days=i - 1) for i in range(1, 8)]
+        forecast_dates = [last_date + datetime.timedelta(days=i - 1) for i in range(1, 8)]
+        plt.plot(actual_dates, actual_rates, label='Actual Exchange Rates', color='red')
+        plt.plot(forecast_dates, forecast_rates, label='Forecasted Exchange Rates', linestyle='--')
         plt.xlabel('Dates')
         plt.ylabel('Exchange Rates')
-        plt.title(f'Exchange Rates for {self.base} to {self.target} over the last month with the 7-day forecast using '
-                  f'the {self.model_type} model.')
+        plt.title(f'Exchange Rates for {self.base} to {self.target} over the last two months '
+                  f'with the 7-day forecast using the {self.model_type} model.')
         plt.gca().xaxis.set_major_locator(mdates.MonthLocator(interval=1))
         plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))
         plt.gcf().autofmt_xdate()
