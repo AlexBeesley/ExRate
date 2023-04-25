@@ -42,7 +42,7 @@ class ModelManager:
         early_stopping = EarlyStopping(monitor='val_loss', patience=20,
                                        restore_best_weights=True, verbose=self.verbosity)
         model.compile(loss=mean_absolute_error, optimizer='adam', metrics=['mae'])
-        history = model.fit(x_train, y_train, epochs=200, batch_size=32, validation_split=0.1,
+        history = model.fit(x_train, y_train, epochs=100, batch_size=32, validation_split=0.1,
                             callbacks=[early_stopping], shuffle=False, verbose=self.verbosity)
         return history
 

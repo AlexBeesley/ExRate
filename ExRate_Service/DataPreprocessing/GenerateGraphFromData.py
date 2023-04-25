@@ -6,11 +6,12 @@ import seaborn as sns
 
 
 class GenerateGraphsFromData:
-    def __init__(self, model_type, yrates, wrates, dates, base, target, history, forecast):
+    def __init__(self, model_type, yrates, wrates, ydates, wdates, base, target, history, forecast):
         self.model_type = model_type
         self.yrates = yrates
         self.wrates = wrates
-        self.dates = dates
+        self.ydates = ydates
+        self.wdates = wdates
         self.base = base
         self.target = target
         self.history = history.history
@@ -37,27 +38,27 @@ class GenerateGraphsFromData:
         plt.legend()
         plt.show()
 
-        historical_rates = self.yrates[-60:]
-        historical_dates = self.dates[-60:]
-        actual_rates = pd.to_numeric(self.wrates[:7])
-        forecast_dates = [datetime.date.today() + datetime.timedelta(days=i) for i in range(1, 8)]
-        forecast_rates = pd.to_numeric(self.forecast)
-        forecast_dates = pd.to_datetime(forecast_dates)
-        dates = [datetime.datetime.strptime(d, '%Y-%m-%d').date() for d in historical_dates]
+        historical_dates = [datetime.datetime.strptime(d, '%Y-%m-%d').date() for d in self.ydates[-60:]]
+        historical_rates = pd.to_numeric(self.yrates[-60:])
+        last_historical_date = historical_dates[-1]
+        last_historical_rate = historical_rates[-1]
+        week_dates = [datetime.datetime.strptime(d, '%Y-%m-%d').date() for d in self.wdates]
+        week_rates = pd.to_numeric(self.wrates)
+        forecast_dates = [last_historical_date + datetime.timedelta(days=i) for i in range(1, 8)]
+        forecast_rates = [week_rates[0]] + pd.to_numeric(self.forecast[1:]).tolist()
 
         plt.figure(figsize=(12, 6))
-        plt.plot(dates, historical_rates, label='Historical Exchange Rates')
-        last_date = dates[-1]
-        actual_dates = [last_date + datetime.timedelta(days=i - 1) for i in range(1, 8)]
-        forecast_dates = [last_date + datetime.timedelta(days=i - 1) for i in range(1, 8)]
-        plt.plot(actual_dates, actual_rates, label='Actual Exchange Rates', color='red')
+        plt.plot(historical_dates + week_dates, historical_rates.tolist() + week_rates.tolist(),
+                 label='Historical Exchange Rates')
+        plt.plot(week_dates, week_rates, label='Actual Exchange Rates', color='red')
         plt.plot(forecast_dates, forecast_rates, label='Forecasted Exchange Rates', linestyle='--')
         plt.xlabel('Dates')
         plt.ylabel('Exchange Rates')
-        plt.title(f'Exchange Rates for {self.base} to {self.target} over the last two months '
+        plt.title(f'Exchange Rates for {self.base} to {self.target} over the last year '
                   f'with the 7-day forecast using the {self.model_type} model.')
         plt.gca().xaxis.set_major_locator(mdates.MonthLocator(interval=1))
         plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))
         plt.gcf().autofmt_xdate()
         plt.legend()
         plt.show()
+
