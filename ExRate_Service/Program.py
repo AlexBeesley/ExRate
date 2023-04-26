@@ -27,11 +27,12 @@ def display_results(has_args, year_dates, year_rates, week_dates, week_rates, mo
         graphs = GenerateGraphsFromData(model_type=model_type,
                                         yrates=year_rates,
                                         wrates=week_rates,
+                                        ydates=year_dates,
+                                        wdates=week_dates,
                                         base=base,
                                         target=target,
                                         history=history,
-                                        forecast=forecast,
-                                        dates=year_dates,)
+                                        forecast=forecast)
         graphs.display_evaluation_graphs()
 
 

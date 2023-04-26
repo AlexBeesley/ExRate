@@ -21,6 +21,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState("unset");
   const [errorMessage, setErrorMessage] = useState("");
   const [data, setData] = useState<any>(null);
+  const apiHost = "https://exrate.azurewebsites.net/";
+  const localHost = "https://localhost:7064/";
 
   useEffect(() => {
     const currencies = ['USD', 'EUR', 'JPY', 'GBP', 'AUD', 'CAD', 'CHF', 'CNH', 'HKD', 'NZD'];
@@ -45,71 +47,78 @@ export default function Home() {
 
   const handleButtonClick = async () => {
     console.log('Button clicked');
-    setIsLoading("true");
+    setIsLoading('true');
     try {
       const postResponse = await fetch(
-        `https://exrate.azurewebsites.net/api/GetExRateForecast?baseCurrency=${baseCurrency}&targetCurrency=${targetCurrency}&modelType=${modelType}`,
+        `${localHost}api/GetExRateForecast?baseCurrency=${baseCurrency}&targetCurrency=${targetCurrency}&modelType=${modelType}`,
         {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
         }
       );
       console.log('POST response:', postResponse);
-
-      if (postResponse.status !== 200) {
-        setIsLoading("failed");
-        throw new Error("Failed to fetch forecast data");
+  
+      if (!postResponse.ok) {
+        setErrorMessage('Failed to fetch forecast data');
+        setIsLoading('failed');
+        throw new Error('Failed to fetch forecast data');
       }
-
+  
       const postJsonData = await postResponse.json();
       const token = postJsonData.token;
       console.log('Token:', token);
-
+  
       const getResponse = await fetchWithRetry(
-        `https://exrate.azurewebsites.net/api/GetExRateForecast/${token}`,
+        `${localHost}api/GetExRateForecast/${token}`,
         10000,
         400000
       );
       console.log('GET response:', getResponse);
-
-      if (getResponse.status !== 200) {
-        setIsLoading("failed");
-        if(getResponse.status === 503) {
-          setErrorMessage("503 - Service unavailable");
-        }
-        setErrorMessage("An unexpected error occurred");
+  
+      if (!getResponse.ok) {
+        setErrorMessage('Failed to fetch forecast data');
+        setIsLoading('failed');
+        throw new Error('Failed to fetch forecast data');
       }
-
+  
       const getJsonData = await getResponse.json();
       setData(getJsonData);
-      setIsLoading("false");
+      setIsLoading('false');
     } catch (error) {
       console.error(error);
-      setIsLoading("failed");
+      setErrorMessage(error.message);
+      setIsLoading('failed');
     }
   };
-
+  
   const fetchWithRetry = async (url, interval, maxDuration) => {
     console.log('Fetching:', url);
     const maxAttempts = Math.floor(maxDuration / interval);
     let attempts = 0;
-
+  
     while (attempts < maxAttempts) {
       const response = await fetch(url);
       console.log('Retry attempt:', attempts + 1, 'Response:', response);
-      if (response.status !== 404) {
-        if (response.status !== 200) {
-          if (response.status === 503) {
-            throw new Error(errorMessage);
-          }
-          throw new Error(errorMessage);
-        }
+  
+      if (response.status === 200) {
         return response;
+      } else if (response.status === 503) {
+        setErrorMessage('503 - Service unavailable');
+        setIsLoading('failed');
+        throw new Error('503 - Service unavailable');
+      } else if (response.status !== 404) {
+        setErrorMessage('An unexpected error occurred');
+        setIsLoading('failed');
+        throw new Error('An unexpected error occurred');
       }
+  
       attempts++;
       await new Promise((resolve) => setTimeout(resolve, interval));
     }
-    throw new Error(errorMessage);
+  
+    setErrorMessage('Max retries exceeded');
+    setIsLoading('failed');
+    throw new Error('Max retries exceeded');
   };
 
   const handleCurrencyChange = (
