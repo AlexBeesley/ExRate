@@ -1,7 +1,7 @@
 import numpy as np
+
 from keras.callbacks import EarlyStopping
 from keras.losses import mean_absolute_error
-
 from DataPreprocessing.DataNormaliser import DataNormaliser
 from MachineLearning.Models.FCNN import FCNN
 from MachineLearning.Models.LSTM import LSTM

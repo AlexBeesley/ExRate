@@ -10,7 +10,7 @@ export default function ErrorBox({ errorMessage }: ErrorBoxProps) {
     <div className={Styles.error}>
       <h3>Oops! Something went wrong.</h3>
       <p>Please try again later.</p>
-      <p>{errorMessage}</p>
+      <p><strong>Error: </strong>{errorMessage}</p>
     </div>
   );
 }

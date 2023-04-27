@@ -1,11 +1,11 @@
 import argparse
 import os
-import random
 
 from pandas import read_csv
 from DataPreprocessing.GenerateGraphFromData import GenerateGraphsFromData
 from DataPreprocessing.ProcessDataFromResponse import ProcessDataFromResponse
 from MachineLearning.ModelManager import ModelManager
+from Utils.PercentageDifferenceCalculator import PercentageDifferenceCalculator
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -15,12 +15,13 @@ def read_currency_codes():
     return data['AlphabeticCode'].tolist()
 
 
-def display_results(has_args, year_dates, year_rates, week_dates, week_rates, model_type, history, forecast, base, target):
+def display_results(has_args, year_dates, year_rates, week_dates, week_rates, model_type, history, forecast, base,
+                    target):
     if has_args:
         historical_data = dict(zip(year_dates, year_rates))
-        forecast = dict(zip(week_dates[-7:], forecast))
+        forecast_data = dict(zip(week_dates[-7:], forecast))
         print(historical_data)
-        print(forecast)
+        print(forecast_data)
     else:
         print(f"Actual: {week_rates}")
         print(f"Forecast: {forecast}")
@@ -33,6 +34,9 @@ def display_results(has_args, year_dates, year_rates, week_dates, week_rates, mo
                                         target=target,
                                         history=history,
                                         forecast=forecast)
+        calculator = PercentageDifferenceCalculator()
+        diff_percentage = calculator.percentage_difference(forecast, week_rates)
+        print(f"Percentage difference: {diff_percentage:.2f}%")
         graphs.display_evaluation_graphs()
 
 
