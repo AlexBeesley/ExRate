@@ -13,7 +13,7 @@ While the purpose of this project is to answer the academic question, this proje
 
 # ExRate Service
 
-This service is responsible for collecting exchange rate data, this data is collected from apilayer.com and its documentation is available [here](https://apilayer.com/marketplace/exchangerates_data-api?live_demo=show).
+This service is responsible for collecting exchange rate data, this data is collected from apilayer.com.
 
 This service offers two types of models, a Fully Connected Neural Network (FCNN) and a Long Short-Term Memory (LSTM) model, for the prediction task.
 
