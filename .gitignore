@@ -16,6 +16,7 @@ dist/
 .idea/
 
 # .NET
+*appsettings*
 *.rsuser
 *.suo
 *.user
