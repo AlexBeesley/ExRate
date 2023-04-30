@@ -7,6 +7,10 @@ from DataPreprocessing.ProcessDataFromResponse import ProcessDataFromResponse
 from MachineLearning.ModelManager import ModelManager
 from Utils.PercentageDifferenceCalculator import PercentageDifferenceCalculator
 
+if not os.path.isfile(".env"):
+    raise FileNotFoundError("A .env file is required. Please create a .env file in the script directory and add your "
+                            "API key from https://apilayer.com/marketplace/exchangerates_data-api.")
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
