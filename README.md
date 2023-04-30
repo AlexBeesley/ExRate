@@ -35,7 +35,7 @@ This service offers two types of models, a Fully Connected Neural Network (FCNN)
 Use `pip install [Package Name]==[Required Version]` to install the required packages.
 
 ## Usage
-First, make sure to obtain an API key for the exchange rates data from a service like apilayer. Add your API key to a `.env` file in the project's root directory:
+First, make sure to obtain an API key for the exchange rates data from [here](https://apilayer.com/marketplace/exchangerates_data-api). Add your API key to a `.env` file in the scritp's directory:
 
 ```
 API_KEY=YOUR_API_KEY_HERE
