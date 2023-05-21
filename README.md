@@ -13,7 +13,7 @@ While the purpose of this project is to answer the academic question, this proje
 
 # ExRate Service
 
-This service is responsible for collecting exchange rate data, this data is collected from apilayer.com and its documentation is available [here](https://apilayer.com/marketplace/exchangerates_data-api?live_demo=show).
+This service is responsible for collecting exchange rate data, this data is collected from apilayer.com.
 
 This service offers two types of models, a Fully Connected Neural Network (FCNN) and a Long Short-Term Memory (LSTM) model, for the prediction task.
 
@@ -35,7 +35,7 @@ This service offers two types of models, a Fully Connected Neural Network (FCNN)
 Use `pip install [Package Name]==[Required Version]` to install the required packages.
 
 ## Usage
-First, make sure to obtain an API key for the exchange rates data from a service like apilayer. Add your API key to a `.env` file in the project's root directory:
+First, make sure to obtain an API key for the exchange rates data from [here](https://apilayer.com/marketplace/exchangerates_data-api). Add your API key to a `.env` file in the scritp's directory:
 
 ```
 API_KEY=YOUR_API_KEY_HERE
