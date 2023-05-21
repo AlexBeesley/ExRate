@@ -29,8 +29,15 @@ module.exports = {
         test: /\.(woff(2)?|eot|ttf|otf|svg|)$/,
         type: 'asset/inline',
       },
+      {
+        test: /\.(pdf)$/,
+        type: 'asset/resource',
+        generator: {
+          filename: 'assets/pdf/[name].[hash:8][ext]',
+        },
+      },
     ],
-  },
+  },  
   output: {
     path: path.resolve(__dirname, '..', './build'),
     filename: 'bundle.js',

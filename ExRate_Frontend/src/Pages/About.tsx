@@ -1,11 +1,12 @@
 import Styles from '../Styles/about.module.scss'
+import PDFFile from '../Documents/CI601-Final_Report-David_Beesley.pdf';
 
 export default function About() {
   return (
     <div className={Styles.aboutContent}>
       <h1>CI601 The Computing Project</h1>
       <p>2022 Semesters 1 and 2</p>
-      <p className={Styles.hint}>Download a copy of the dissertation produced as part of this project <a href="/Documents/CI601-Final_Report-David_Beesley.pdf" download>here</a>.</p>
+      <p className={Styles.hint}>Download a copy of the dissertation produced as part of this project <a href={PDFFile}>here</a>.</p>
       <h2>ExRate</h2>
       <p>This project aims to answer the following academic question: ‘Can
         Machine Learning forecast exchange rates within a 5% margin of
