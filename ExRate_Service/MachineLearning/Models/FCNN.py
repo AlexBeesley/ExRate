@@ -1,6 +1,6 @@
 from keras import Sequential, regularizers
 from keras.layers import Dense, Flatten, Dropout, BatchNormalization
-from keras.optimizers import Adam
+from keras.optimizers import RMSprop
 
 
 class FCNN:
@@ -16,7 +16,7 @@ class FCNN:
         self.model.add(Dense(32, activation='relu', kernel_regularizer=regularizers.l2(0.001)))
         self.model.add(BatchNormalization())
         self.model.add(Dense(1))
-        self.model.compile(optimizer=Adam(learning_rate=0.001), loss='mse', metrics=['mae'])
+        self.model.compile(optimizer=RMSprop(learning_rate=0.001), loss='mse', metrics=['mae'])
 
     def get_model(self):
         return self.model
