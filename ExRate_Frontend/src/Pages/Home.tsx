@@ -22,7 +22,7 @@ export default function Home() {
   const [errorMessage, setErrorMessage] = useState("");
   const [data, setData] = useState<any>(null);
   const apiHost = "https://exrate.azurewebsites.net/";
-  const localHost = "https://localhost:7064/";
+  const localHost = "http://localhost:8081/";
 
   useEffect(() => {
     const currencies = ['USD', 'EUR', 'JPY', 'GBP', 'AUD', 'CAD', 'CHF', 'CNH', 'HKD', 'NZD'];

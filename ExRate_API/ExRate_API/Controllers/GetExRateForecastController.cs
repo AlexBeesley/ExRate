@@ -68,7 +68,7 @@ namespace ExRate_API.Controllers
             }
             catch (Exception ex) 
             {
-                return StatusCode(503, $"Data from API not available. Please try again later. \nError: {ex}");
+                return StatusCode(503, $"Data from dependant API not available. Please try again later. \nError: {ex}");
             }
         }
 

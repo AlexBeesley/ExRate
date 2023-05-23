@@ -1,6 +1,7 @@
 ﻿using ExRate_API.Controllers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Text;
@@ -23,7 +24,7 @@ namespace ExRate_API.DataFromService
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = fileName,
-                    Arguments = scriptPath + $" -b {targetCurrency} -t {baseCurrency} -m {modelType}",
+                    Arguments = scriptPath + $" -b {baseCurrency} -t {targetCurrency} -m {modelType}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -33,16 +34,16 @@ namespace ExRate_API.DataFromService
                 EnableRaisingEvents = true
             };
 
-            string? errorMessage = null;
             StringBuilder outputBuilder = new StringBuilder();
+
             process.ErrorDataReceived += (sender, e) =>
             {
-                if (!string.IsNullOrEmpty(e.Data))
+                if (!string.IsNullOrEmpty(e.Data) && !IsWarningMessage(e.Data))
                 {
                     _logger.LogError($"Error from process: {e.Data}");
-                    errorMessage = e.Data;
                 }
             };
+
             process.OutputDataReceived += (sender, e) =>
             {
                 if (!string.IsNullOrEmpty(e.Data))
@@ -53,13 +54,14 @@ namespace ExRate_API.DataFromService
 
             await ProcessSequenceAsync(process);
 
-            if (errorMessage != null)
-            {
-                throw new Exception(errorMessage);
-            }
-
             return CombineIntoJson(outputBuilder.ToString());
         }
+
+        private bool IsWarningMessage(string message)
+        {
+            return message.Contains("TF-TRT Warning: Could not find TensorRT");
+        }
+
 
         protected virtual string CombineIntoJson(string output)
         {
