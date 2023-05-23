@@ -21,8 +21,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState("unset");
   const [errorMessage, setErrorMessage] = useState("");
   const [data, setData] = useState<any>(null);
-  const apiHost = "https://exrate.azurewebsites.net/";
-  const localHost = "http://localhost:8081/";
+  const apiHost = "http://134.209.186.231/";
 
   useEffect(() => {
     const currencies = ['USD', 'EUR', 'JPY', 'GBP', 'AUD', 'CAD', 'CHF', 'CNH', 'HKD', 'NZD'];
@@ -50,7 +49,7 @@ export default function Home() {
     setIsLoading('true');
     try {
       const postResponse = await fetch(
-        `${localHost}api/GetExRateForecast?baseCurrency=${baseCurrency}&targetCurrency=${targetCurrency}&modelType=${modelType}`,
+        `${apiHost}api/GetExRateForecast?baseCurrency=${baseCurrency}&targetCurrency=${targetCurrency}&modelType=${modelType}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -69,7 +68,7 @@ export default function Home() {
       console.log('Token:', token);
   
       const getResponse = await fetchWithRetry(
-        `${localHost}api/GetExRateForecast/${token}`,
+        `${apiHost}api/GetExRateForecast/${token}`,
         10000,
         400000
       );
