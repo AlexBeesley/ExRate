@@ -38,7 +38,7 @@ namespace ExRate_API.DataFromService
 
             process.ErrorDataReceived += (sender, e) =>
             {
-                if (!string.IsNullOrEmpty(e.Data) && !IsWarningMessage(e.Data))
+                if (!string.IsNullOrEmpty(e.Data) && !IsTensorRTWarningMessage(e.Data))
                 {
                     _logger.LogError($"Error from process: {e.Data}");
                 }
@@ -57,7 +57,7 @@ namespace ExRate_API.DataFromService
             return CombineIntoJson(outputBuilder.ToString());
         }
 
-        private bool IsWarningMessage(string message)
+        private bool IsTensorRTWarningMessage(string message)
         {
             return message.Contains("TF-TRT Warning: Could not find TensorRT");
         }
